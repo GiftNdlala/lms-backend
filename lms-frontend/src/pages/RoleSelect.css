@@ -1,0 +1,80 @@
+.MuiPaper-root {
+  transition: transform 0.2s ease-in-out;
+}
+
+.MuiPaper-root:hover {
+  transform: translateY(-5px);
+}
+
+/* Rainbow gradient line under the heading */
+.rainbow-line {
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ff8000,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #8000ff
+  );
+  margin: 16px auto;
+  border-radius: 2px;
+  width: 80%;
+}
+
+/* Logo animation */
+img {
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.02);
+}
+
+/* Custom scrollbar for the page */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8231D2;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6a1fb3;
+}
+
+/* Select dropdown customization */
+.MuiSelect-select {
+  font-size: 1rem !important;
+}
+
+.MuiMenuItem-root {
+  font-size: 1rem !important;
+  padding: 12px 16px !important;
+}
+
+.MuiMenuItem-root:hover {
+  background-color: rgba(130, 49, 210, 0.08) !important;
+}
+
+/* Button animation */
+.MuiButton-root {
+  transition: all 0.3s ease !important;
+}
+
+.MuiButton-root:hover:not(.Mui-disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(130, 49, 210, 0.2);
+}
+
+/* Paper shadow enhancement */
+.MuiPaper-root {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+} 

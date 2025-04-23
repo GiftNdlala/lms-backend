@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+*.egg
+
+# Virtual Environment
+env/
+venv/
+ENV/
+.venv/
+
+# Django Migrations
+**/migrations/
+!*/migrations/__init__.py
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Environment Variables
+.env
+.env.*
+
+# Logs and Debug
+*.log
+*.pot
+*.pyc
+*.mo
+*.log
+*.bak
+*.swp
+*.tmp
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# VS Code Settings
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# OS generated
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Media/Static files (uncomment if stored locally and not managed via cloud)
+# media/
+# staticfiles/

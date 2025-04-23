@@ -1,0 +1,201 @@
+/* Set up the overall background */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-size: cover;
+}
+
+
+/* Centering container */
+.min-h-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card styling */
+.bg-white {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Logo styling */
+.bg-white img {
+  height: 50px;
+  margin-bottom: 1rem;
+}
+
+/* Heading text */
+.bg-white h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+/* Subtext */
+.bg-white p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+/* Dropdown styling */
+select {
+  font-size: 1.1rem;
+  padding: 0.75rem;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* Animated glow + gradient underline for portal heading */
+.portal-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  position: relative;
+  animation: glow 2s ease-in-out infinite alternate;
+  margin-bottom: 2rem;
+}
+
+/* Gradient underline effect */
+.portal-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  animation: pulse 3s infinite ease-in-out;
+}
+
+/* Glow animation */
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px rgba(255,255,255,0.4), 0 0 20px rgba(255,255,255,0.2);
+  }
+  to {
+    text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 30px rgba(255,255,255,0.6);
+  }
+}
+
+/* Underline pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.2);
+    opacity: 0.6;
+  }
+}
+
+
+/* Button styling */
+button {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, cursor 0.3s ease;
+}
+
+button:not(:disabled):hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 0 10px 2px rgba(255, 0, 150, 0.2),
+              0 0 20px 4px rgba(0, 200, 255, 0.15);
+}
+
+/* Make the logo more prominent */
+.gas-logo {
+  height: 80px;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+}
+
+/* Dropdown container for custom arrow */
+.custom-select-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Styled select */
+.custom-select {
+  appearance: none;
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 16px;
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  outline: none;
+}
+
+/* Add custom dropdown arrow */
+.custom-select-container::after {
+  content: '▼';
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+  font-size: 14px;
+}
+
+
+select {
+  background-color: #000;
+  color: #fff;
+}
+
+select option {
+  color: #000; /* Dropdown items stay visible */
+}
+
+button:disabled {
+  background-color: #178620;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.role-subtext {
+  color: #22c55e; /* Tailwind's green-500 */
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7); /* To help with contrast */
+}
+
+
+button:not(:disabled) {
+  background-color: #2563eb;
+  color: white;
+}
+
+button:not(:disabled):hover {
+  background-color: #1d4ed8;
+}

@@ -1,0 +1,360 @@
+/* ========== GENERAL LAYOUT ========== */
+:root {
+  --primary-color: #8231D2;
+  --primary-dark: #6a1fb3;
+  --secondary-color: #4CAF50;
+  --secondary-dark: #388E3C;
+  --background-light: #f5f6fa;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --white: #fff;
+  --gradient-primary: linear-gradient(135deg, #8231D2 0%, #4CAF50 100%);
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-light);
+  }
+
+  .view-details-btn {
+  background-color: #8231D2;
+    color: white;
+  padding: 0.8rem 1.5rem;
+    border: none;
+  border-radius: 12px;
+  font-weight: 600;
+    cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(130, 49, 210, 0.2);
+  }
+  
+  .view-details-btn:hover {
+  background-color: #6a1fb3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(130, 49, 210, 0.3);
+  }
+  
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+  width: 280px;
+  background: var(--gradient-primary);
+  color: var(--white);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
+  }
+  
+  .logo-container {
+    text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .sidebar-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar h2 {
+    margin: 0 0 1.5rem;
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  
+  .sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar nav ul li {
+  margin: 0.5rem 0;
+  }
+  
+  .sidebar nav ul li a {
+  color: var(--white);
+    text-decoration: none;
+    font-size: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  }
+  
+  .sidebar nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(8px);
+  }
+  
+  /* ========== MAIN CONTENT ========== */
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+  background-color: var(--background-light);
+  }
+  
+  .dashboard-header {
+    margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dashboard-header h2 {
+  font-size: 2rem;
+    margin-bottom: 0.5rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  }
+  
+  .dashboard-header span {
+    font-weight: normal;
+  }
+  
+  .dashboard-header p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  }
+  
+  /* ========== DASHBOARD CARDS ========== */
+  .card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  margin-bottom: 2rem;
+  }
+  
+  .card {
+  background: var(--white);
+    padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(130, 49, 210, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(130, 49, 210, 0.15);
+  }
+  
+  .card .icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  }
+  
+  .card h3 {
+    margin: 0.5rem 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  }
+  
+  .card p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  }
+  
+  .card button {
+  background: var(--gradient-primary);
+  color: var(--white);
+    border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+    cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: none;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(130, 49, 210, 0.2);
+  }
+  
+  .card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(130, 49, 210, 0.3);
+  }
+  
+  /* ========== GRADES PAGE ========== */
+  .grades-container {
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .grades-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  }
+  
+  .course-card {
+  background: var(--white);
+  border-left: 5px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.course-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 6px 24px rgba(130, 49, 210, 0.15);
+  }
+  
+  .course-card h4 {
+  color: var(--primary-color);
+  font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .course-status {
+    font-size: 0.95rem;
+  color: #4CAF50;
+  font-weight: 500;
+  }
+  
+  /* ========== PROFILE PAGE ========== */
+  .student-profile-container {
+    padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  }
+  
+  .profile-card {
+  background: var(--white);
+    padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(130, 49, 210, 0.1);
+  }
+  
+  .profile-card h2 {
+    margin-bottom: 1rem;
+    color: #003366;
+  }
+  
+  .profile-field {
+    margin-bottom: 1.2rem;
+  }
+  
+  .profile-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    color: #333;
+  }
+  
+  .profile-field input {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.5rem;
+  }
+  
+  .tab {
+    background: none;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+  
+  .tab.active {
+    background-color: #e6f7ff;
+    border: 1px solid #91d5ff;
+  }
+  
+  .order-select {
+    margin-left: auto;
+    font-size: 0.9rem;
+  }
+  
+  /* ========== GRADE CARDS ========== */
+  .grades-table {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+  
+  .grades-header {
+    display: flex;
+    background-color: #f5f5f5;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .grades-header span {
+    flex: 1;
+  }
+  
+  .grades-row {
+    display: flex;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    background: linear-gradient(to bottom, #fefefe, #f5fafd);
+  }
+  
+  .item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sub-links {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+  
+/* Add animation keyframes */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animations to elements */
+.card, .course-card, .profile-card {
+  animation: slideIn 0.5s ease forwards;
+}
+  
+  
+  
