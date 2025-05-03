@@ -19,13 +19,15 @@ const StudentLayout = () => {
         </div>
         <nav>
           <ul>
-            <li><Link to="/dashboard/student/profile">Student Profile</Link></li>
-            <li><Link to="/dashboard/student/courses">Courses</Link></li>
-            <li><Link to="/dashboard/student/messages">Messages</Link></li>
+            <li><Link to="/dashboard/student">Dashboard</Link></li>
+            <li><Link to="/dashboard/student/profile">Profile</Link></li>
+            <li><Link to="/dashboard/student/modules">My Modules</Link></li>
             <li><Link to="/dashboard/student/grades">Grades</Link></li>
-            <li><Link to="/dashboard/student/assessments">Quizzes & Assessments</Link></li>
+            <li><Link to="/dashboard/student/assessments">Assessments</Link></li>
+            <li><Link to="/dashboard/student/messages">Messages</Link></li>
+            <li><Link to="/dashboard/student/announcements">Announcements</Link></li>
             <li><Link to="/dashboard/student/ewallet" className="achievement-link">🏆 Achievements</Link></li>
-            <Link to="/signout" className="signout-link">🚪 Sign Out</Link>
+            <li><Link to="/logout" className="signout-link">🚪 Sign Out</Link></li>
           </ul>
         </nav>
       </aside>

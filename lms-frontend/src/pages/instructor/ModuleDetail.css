@@ -1,0 +1,167 @@
+.module-detail-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.module-detail-header {
+  margin-bottom: 32px;
+}
+
+.module-detail-header h1 {
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.module-detail-header p {
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.content-upload-section {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-upload-section h2 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.upload-container {
+  position: relative;
+}
+
+.upload-container input[type="file"] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.upload-button {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #0056b3;
+}
+
+.upload-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.module-contents {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.module-contents h2 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.content-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.content-icon {
+  font-size: 24px;
+}
+
+.content-details h3 {
+  margin: 0 0 4px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.content-meta {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.content-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.download-btn, .delete-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  border: none;
+  font-size: 0.875rem;
+}
+
+.download-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.download-btn:hover {
+  background-color: #218838;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.no-contents {
+  text-align: center;
+  padding: 32px;
+  color: #666;
+}
+
+.module-loading, .module-error {
+  text-align: center;
+  padding: 48px;
+  color: #666;
+}
+
+.module-error {
+  color: #dc3545;
+} 

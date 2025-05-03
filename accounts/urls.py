@@ -1,8 +1,21 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import (
+    UserViewSet, StudentViewSet, InstructorViewSet, 
+    login, CreateStudentView, InstructorStudentViewSet
+)
 
-app_name = 'accounts'
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'students', StudentViewSet, basename='student')
+router.register(r'instructors', InstructorViewSet, basename='instructor')
+
+# Create a separate router for instructor-specific endpoints
+instructor_router = DefaultRouter()
+instructor_router.register(r'students', InstructorStudentViewSet, basename='instructor-student')
 
 urlpatterns = [
-    # Add your account-specific URLs here
+    path('login/', login, name='login'),
+    path('instructors/', include(instructor_router.urls)),
+    path('', include(router.urls)),
 ] 

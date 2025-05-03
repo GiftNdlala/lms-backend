@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Container,
   Box,
   Select,
   MenuItem,
@@ -174,7 +173,7 @@ const RoleSelect = () => {
             boxShadow: '0 4px 12px rgba(130, 49, 210, 0.4)',
             '&:hover': {
               backgroundColor: '#6a1fb3',
-              boxShadow: '0 6px 16px rgba(130, 49, 210, 0.6)'
+              boxShadow: '0 6px 16px rgba(130, 255, 210, 0.6)'
             },
             '&.Mui-disabled': {
               backgroundColor: 'rgba(255, 255, 255, 0.1)',

@@ -1,0 +1,103 @@
+.modules-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.modules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.modules-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.add-module-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.add-module-btn:hover {
+  background-color: #0056b3;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.module-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.module-card h2 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.module-card p {
+  color: #666;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.module-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #888;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+.view-module-btn {
+  display: block;
+  text-align: center;
+  background-color: #f8f9fa;
+  color: #007bff;
+  padding: 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.view-module-btn:hover {
+  background-color: #e9ecef;
+}
+
+.modules-loading {
+  text-align: center;
+  padding: 48px;
+  color: #666;
+}
+
+.modules-error {
+  text-align: center;
+  padding: 48px;
+  color: #dc3545;
+}
+
+.no-modules {
+  text-align: center;
+  padding: 48px;
+  color: #666;
+  grid-column: 1 / -1;
+} 

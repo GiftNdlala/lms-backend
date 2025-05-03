@@ -1,0 +1,39 @@
+.student-rewards {
+  padding: 20px;
+}
+
+.rewards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.reward-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reward-card h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.reward-card p {
+  margin: 0;
+  color: #666;
+}
+
+.reward-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+} 

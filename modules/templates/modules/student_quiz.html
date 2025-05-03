@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Quizzes - {{ module.title }}</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Available Quizzes</h3>
+                    <div id="quizzesList">
+                        <!-- Quizzes will be loaded here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quiz Attempt Modal -->
+<div class="modal fade" id="quizAttemptModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quizTitle">Quiz Title</h5>
+                <div id="timer" class="ms-auto"></div>
+            </div>
+            <div class="modal-body">
+                <form id="quizForm">
+                    <div id="questionsContainer">
+                        <!-- Questions will be loaded here -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitQuizBtn">Submit Quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentQuizId = null;
+    let currentAttemptId = null;
+    let timeLimit = 0;
+    let timerInterval = null;
+
+    // Load quizzes when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadQuizzes();
+    });
+
+    function loadQuizzes() {
+        fetch(`/api/student/modules/{{ module.id }}/quizzes/`)
+            .then(response => response.json())
+            .then(data => {
+                const quizzesList = document.getElementById('quizzesList');
+                quizzesList.innerHTML = data.quizzes.map(quiz => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${quiz.title}</h5>
+                            <p class="card-text">${quiz.description}</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Time Limit: ${Math.floor(quiz.time_limit / 60)} minutes | 
+                                    Total Points: ${quiz.total_points}
+                                </small>
+                            </p>
+                            <button class="btn btn-primary" onclick="startQuiz(${quiz.id}, ${quiz.time_limit})">
+                                Start Quiz
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function startQuiz(quizId, limit) {
+        currentQuizId = quizId;
+        timeLimit = limit;
+        
+        fetch(`/api/quizzes/${quizId}/attempt/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            currentAttemptId = data.attempt_id;
+            loadQuizQuestions();
+            startTimer();
+            $('#quizAttemptModal').modal('show');
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function loadQuizQuestions() {
+        fetch(`/api/quizzes/${currentQuizId}/questions/`)
+            .then(response => response.json())
+            .then(data => {
+                const questionsContainer = document.getElementById('questionsContainer');
+                questionsContainer.innerHTML = data.questions.map((question, index) => `
+                    <div class="mb-4">
+                        <h6>Question ${index + 1}</h6>
+                        <p>${question.question_text}</p>
+                        ${renderQuestionInput(question)}
+                    </div>
+                `).join('');
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function renderQuestionInput(question) {
+        switch(question.question_type) {
+            case 'MCQ':
+                return `
+                    <div class="form-check">
+                        ${question.choices.map(choice => `
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_${question.id}" 
+                                       value="${choice.text}" id="choice_${choice.id}">
+                                <label class="form-check-label" for="choice_${choice.id}">
+                                    ${choice.text}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            case 'TF':
+                return `
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_${question.id}" 
+                               value="true" id="true_${question.id}">
+                        <label class="form-check-label" for="true_${question.id}">True</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_${question.id}" 
+                               value="false" id="false_${question.id}">
+                        <label class="form-check-label" for="false_${question.id}">False</label>
+                    </div>
+                `;
+            case 'SA':
+                return `
+                    <textarea class="form-control" name="question_${question.id}" rows="3"></textarea>
+                `;
+        }
+    }
+
+    function startTimer() {
+        let timeLeft = timeLimit;
+        const timerElement = document.getElementById('timer');
+        
+        timerInterval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Time Left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            
+            timeLeft--;
+        }, 1000);
+    }
+
+    document.getElementById('submitQuizBtn').addEventListener('click', function() {
+        submitQuiz();
+    });
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        
+        const answers = Array.from(document.querySelectorAll('input[type="radio"]:checked, textarea')).map(element => ({
+            question_id: element.name.split('_')[1],
+            answer: element.value
+        }));
+
+        fetch(`/api/quiz-attempts/${currentAttemptId}/submit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ answers })
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#quizAttemptModal').modal('hide');
+            alert(`Quiz submitted! Your score: ${data.score}`);
+            loadQuizzes();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %} 

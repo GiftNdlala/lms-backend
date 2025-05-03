@@ -3,60 +3,69 @@ import {
   Box,
   Paper,
   Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
   CircularProgress,
   Card,
   CardContent,
-  Grid
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip
 } from '@mui/material';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import StarIcon from '@mui/icons-material/Star';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import axios from 'axios';
 
 const Ewallet = () => {
   const [balance, setBalance] = useState(0);
-  const [achievements, setAchievements] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Simulated data - Replace with actual API calls
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setBalance(750); // Example balance
-      setAchievements([
-        {
-          id: 1,
-          title: 'Quiz Master',
-          description: 'Completed Introduction to JavaScript Quiz',
-          reward: 150,
-          date: '2024-03-15',
-          icon: <StarIcon sx={{ color: '#FFD700' }} />
-        },
-        {
-          id: 2,
-          title: 'Perfect Score',
-          description: 'Achieved 100% in HTML Basics',
-          reward: 200,
-          date: '2024-03-14',
-          icon: <EmojiEventsIcon sx={{ color: '#8231D2' }} />
-        },
-        {
-          id: 3,
-          title: 'Quick Learner',
-          description: 'Completed CSS Fundamentals in record time',
-          reward: 100,
-          date: '2024-03-13',
-          icon: <TrendingUpIcon sx={{ color: '#4CAF50' }} />
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
+    fetchEWalletData();
   }, []);
+
+  const fetchEWalletData = async () => {
+    try {
+      setLoading(true);
+      const [ewalletResponse, transactionsResponse] = await Promise.all([
+        axios.get('/api/ewallets/'),
+        axios.get('/api/transactions/')
+      ]);
+      
+      if (ewalletResponse.data && ewalletResponse.data.length > 0) {
+        setBalance(ewalletResponse.data[0].balance);
+      }
+      setTransactions(transactionsResponse.data);
+    } catch (error) {
+      console.error('Failed to fetch e-wallet data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTransactionIcon = (type) => {
+    switch (type) {
+      case 'assessment_reward':
+        return <StarIcon sx={{ color: '#FFD700' }} />;
+      case 'withdrawal_approved':
+        return <AccountBalanceWalletIcon sx={{ color: '#4CAF50' }} />;
+      default:
+        return <TrendingUpIcon sx={{ color: '#8231D2' }} />;
+    }
+  };
+
+  const getTransactionType = (type) => {
+    const types = {
+      'assessment_reward': 'Assessment Reward',
+      'withdrawal_approved': 'Withdrawal',
+    };
+    return types[type] || type;
+  };
 
   return (
     <Box sx={{ p: 3, maxWidth: '1200px', margin: '0 auto' }}>
@@ -96,11 +105,18 @@ const Ewallet = () => {
                   <Typography variant="h6">Current Balance</Typography>
                 </Box>
                 <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                  R {balance.toFixed(2)}
+                  ₹{balance.toFixed(2)}
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
-                  Keep learning to earn more!
-                </Typography>
+                {balance >= 500 && (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}>
+                    <Typography variant="body2" sx={{ color: '#FFD700', fontWeight: 600 }}>
+                      You are eligible for withdrawal!
+                    </Typography>
+                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                      Please show this balance to your instructor for processing.
+                    </Typography>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -117,55 +133,54 @@ const Ewallet = () => {
               }}
             >
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Recent Achievements
+                Transaction History
               </Typography>
-              <List>
-                {achievements.map((achievement, index) => (
-                  <React.Fragment key={achievement.id}>
-                    {index > 0 && <Divider />}
-                    <ListItem
-                      sx={{
-                        py: 2,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          backgroundColor: 'rgba(130, 49, 210, 0.05)',
-                          transform: 'translateX(8px)'
-                        }
-                      }}
-                    >
-                      <ListItemIcon>
-                        {achievement.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                            {achievement.title}
-                          </Typography>
-                        }
-                        secondary={
-                          <>
-                            <Typography variant="body2" color="text.secondary">
-                              {achievement.description}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              sx={{ color: '#4CAF50', fontWeight: 600, mt: 0.5 }}
-                            >
-                              +R {achievement.reward.toFixed(2)}
-                            </Typography>
-                          </>
-                        }
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{ color: 'text.secondary' }}
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Type</TableCell>
+                      <TableCell>Amount</TableCell>
+                      <TableCell>Description</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow
+                        key={transaction.id}
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: 'rgba(130, 49, 210, 0.05)'
+                          }
+                        }}
                       >
-                        {new Date(achievement.date).toLocaleDateString()}
-                      </Typography>
-                    </ListItem>
-                  </React.Fragment>
-                ))}
-              </List>
+                        <TableCell>
+                          {new Date(transaction.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {getTransactionIcon(transaction.transaction_type)}
+                            <Typography sx={{ ml: 1 }}>
+                              {getTransactionType(transaction.transaction_type)}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={`${transaction.amount > 0 ? '+' : ''}₹${transaction.amount.toFixed(2)}`}
+                            sx={{
+                              backgroundColor: transaction.amount > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                              color: transaction.amount > 0 ? '#4CAF50' : '#F44336'
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{transaction.description}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
           </Grid>
         </Grid>

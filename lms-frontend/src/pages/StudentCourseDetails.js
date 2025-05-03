@@ -1,115 +1,155 @@
 // src/pages/StudentCourseDetails.js
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import './DashboardStyles.css';
-
-const courseData = {
-  1: {
-    title: "Applied Renewable Energy",
-    code: "ARE101",
-    instructor: "Mr. Mokoena",
-    content: [
-      { type: "folder", title: "LEARNER GUIDE AND COURSE INFORMATION" },
-      { type: "ebook", title: "Prescribed Book : e-Book" },
-      {
-        type: "unit",
-        title: "Learning Unit 1: Solar Basics",
-        description:
-          "Understand solar power, basic concepts, installation methods, and safety procedures.",
-      },
-      {
-        type: "unit",
-        title: "Learning Unit 2: Photovoltaics",
-        description:
-          "Learn how photovoltaic systems work and how to troubleshoot common issues.",
-      },
-    ],
-  },
-  2: {
-    title: "Solar Auditing",
-    code: "SA202",
-    instructor: "Ms. Dlamini",
-    content: [
-      { type: "folder", title: "AUDIT HANDBOOK & TOOLS" },
-      { type: "ebook", title: "Energy Efficiency Guidebook" },
-      {
-        type: "unit",
-        title: "Learning Unit 1: Site Assessment",
-        description:
-          "Conduct pre-installation energy audits and identify solar potential areas.",
-      },
-    ],
-  },
-  3: {
-    title: "New Green Venture",
-    code: "NGV303",
-    instructor: "Dr. Khumalo",
-    content: [
-      { type: "folder", title: "BUSINESS PLANNING MATERIAL" },
-      {
-        type: "unit",
-        title: "Learning Unit 1: Green Innovation",
-        description:
-          "Develop green business ideas and understand sustainability metrics.",
-      },
-    ],
-  },
-};
 
 const StudentCourseDetails = () => {
   const { courseId } = useParams();
-  const course = courseData[courseId];
+  const navigate = useNavigate();
+  const [course, setCourse] = useState(null);
+  const [modules, setModules] = useState([]);
+  const [assignmentList, setAssignmentList] = useState([]);
+  const [gradeData, setGradeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!course) return <div>Course not found.</div>;
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const [courseRes, modulesRes, assignmentsRes, gradesRes] = await Promise.all([
+          api.courses.getCourse(courseId),
+          api.courses.getModules(courseId),
+          api.assignments.list(courseId),
+          api.grades.getCourseGrades(courseId)
+        ]);
+
+        setCourse(courseRes.data);
+        setModules(modulesRes.data);
+        setAssignmentList(assignmentsRes.data);
+        setGradeData(gradesRes.data);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load course data');
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [courseId]);
+
+  const calculateOverallProgress = () => {
+    if (!modules.length) return 0;
+    const completedModules = modules.filter(module => module.completed).length;
+    return Math.round((completedModules / modules.length) * 100);
+  };
+
+  if (loading) return <div className="loading">Loading course details...</div>;
+  if (error) return <div className="error-message">{error}</div>;
+  if (!course) return <div className="error-message">Course not found</div>;
 
   return (
-    <div className="course-details-page">
-      <h2>{course.code} - {course.title}</h2>
-
-      <div className="course-top-nav">
-        <span className="nav-link active-tab">Content</span>
-        <Link to={`/dashboard/student/grades/details/${courseId}`} className="nav-link">Gradebook</Link>
-        <Link to="/dashboard/student/messages" className="nav-link">Messages</Link>
-        <Link to="/dashboard/student/announcements" className="nav-link">Announcements</Link>
-        <Link to="/dashboard/student/ewallet" className="nav-link">🏆 Achievements</Link>
+    <div className="course-details-container">
+      <div className="course-header">
+        <div className="course-title">
+          <h2>{course.title}</h2>
+          <span className="course-code">{course.code}</span>
+        </div>
+        <div className="course-meta">
+          <span>Instructor: {course.instructor_name}</span>
+          <span>Start Date: {new Date(course.start_date).toLocaleDateString()}</span>
+          <span>End Date: {new Date(course.end_date).toLocaleDateString()}</span>
+        </div>
       </div>
 
-      <div className="course-main">
-        <div className="course-content">
-          <h3>Course Content</h3>
-          {course.content.map((item, index) => (
-            <div className="content-box" key={index}>
-              <h4>{item.title}</h4>
-              {item.description && <p>{item.description}</p>}
-            </div>
-          ))}
+      <div className="course-progress-section">
+        <h3>Course Progress</h3>
+        <div className="progress-bar">
+          <div 
+            className="progress-fill"
+            style={{ width: `${calculateOverallProgress()}%` }}
+          />
+        </div>
+        <span className="progress-text">{calculateOverallProgress()}% Complete</span>
+      </div>
+
+      <div className="course-content-grid">
+        <div className="content-section modules-section">
+          <h3>Modules</h3>
+          <div className="modules-list">
+            {modules.map((module) => (
+              <div key={module.id} className="module-card">
+                <div className="module-info">
+                  <h4>{module.title}</h4>
+                  <p>{module.description}</p>
+                </div>
+                <div className="module-status">
+                  {module.completed ? (
+                    <span className="status-badge completed">Completed</span>
+                  ) : (
+                    <button 
+                      className="primary-button"
+                      onClick={() => navigate(`/dashboard/student/courses/${courseId}/modules/${module.id}`)}
+                    >
+                      Start Module
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="course-side">
-          <div className="course-faculty">
-            <p className="label">Course Faculty</p>
-            <div className="instructor-card">
-              <div className="avatar-placeholder" />
-              <div>
-                <strong>{course.instructor}</strong>
-                <p className="badge">Instructor</p>
+        <div className="content-section assignments-section">
+          <h3>Assignments</h3>
+          <div className="assignments-list">
+            {assignmentList.map((assignment) => (
+              <div key={assignment.id} className="assignment-card">
+                <div className="assignment-info">
+                  <h4>{assignment.title}</h4>
+                  <p>{assignment.description}</p>
+                  <div className="assignment-meta">
+                    <span>Due: {new Date(assignment.due_date).toLocaleDateString()}</span>
+                    <span>Points: {assignment.points}</span>
+                  </div>
+                </div>
+                <div className="assignment-status">
+                  {assignment.submitted ? (
+                    <span className="status-badge submitted">Submitted</span>
+                  ) : (
+                    <button 
+                      className="primary-button"
+                      onClick={() => navigate(`/dashboard/student/courses/${courseId}/assignments/${assignment.id}`)}
+                    >
+                      Submit Assignment
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {gradeData && (
+          <div className="content-section grades-section">
+            <h3>Grades</h3>
+            <div className="grades-summary">
+              <div className="grade-item">
+                <span>Overall Grade</span>
+                <span className="grade">{gradeData.overall_grade || 'N/A'}</span>
+              </div>
+              <div className="grade-item">
+                <span>Assignments Average</span>
+                <span className="grade">{gradeData.assignments_average || 'N/A'}</span>
+              </div>
+              <div className="grade-item">
+                <span>Quizzes Average</span>
+                <span className="grade">{gradeData.quizzes_average || 'N/A'}</span>
               </div>
             </div>
           </div>
-          <div className="details-actions">
-            <p className="label">Details & Actions</p>
-            <ul>
-              <li><strong>Course Description:</strong> <Link>View</Link></li>
-              <li><strong>Progress Tracking:</strong> On</li>
-              <li><strong>Class Collaborate:</strong> <Link>Join session</Link></li>
-              <li><strong>Attendance:</strong> <Link>View your attendance</Link></li>
-              <li><strong>Course Achievements:</strong> <Link to="/dashboard/student/ewallet">View rewards</Link></li>
-            </ul>
-          </div>
-        </div>
+        )}
       </div>
-
-      <Link to="/dashboard/student/courses" className="back-link">← Back to Courses</Link>
     </div>
   );
 };

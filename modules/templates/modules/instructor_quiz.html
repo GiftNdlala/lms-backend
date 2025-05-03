@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Quiz Management - {{ module.title }}</h2>
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+                Create New Quiz
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Existing Quizzes</h3>
+                    <div id="quizzesList">
+                        <!-- Quizzes will be loaded here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Quiz Modal -->
+<div class="modal fade" id="createQuizModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Quiz</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createQuizForm">
+                    <div class="mb-3">
+                        <label for="quizTitle" class="form-label">Quiz Title</label>
+                        <input type="text" class="form-control" id="quizTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quizDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="quizDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="timeLimit" class="form-label">Time Limit (minutes)</label>
+                        <input type="number" class="form-control" id="timeLimit" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="totalPoints" class="form-label">Total Points</label>
+                        <input type="number" class="form-control" id="totalPoints" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createQuizBtn">Create Quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Question Modal -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Question</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addQuestionForm">
+                    <div class="mb-3">
+                        <label for="questionType" class="form-label">Question Type</label>
+                        <select class="form-select" id="questionType" required>
+                            <option value="MCQ">Multiple Choice</option>
+                            <option value="TF">True/False</option>
+                            <option value="SA">Short Answer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="questionText" class="form-label">Question Text</label>
+                        <textarea class="form-control" id="questionText" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="questionPoints" class="form-label">Points</label>
+                        <input type="number" class="form-control" id="questionPoints" required>
+                    </div>
+                    <div id="choicesContainer" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Choices</label>
+                            <div id="choicesList">
+                                <!-- Choices will be added here -->
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="addChoiceBtn">Add Choice</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="addQuestionBtn">Add Question</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentQuizId = null;
+
+    // Load quizzes when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadQuizzes();
+    });
+
+    // Handle quiz creation
+    document.getElementById('createQuizBtn').addEventListener('click', function() {
+        const quizData = {
+            title: document.getElementById('quizTitle').value,
+            description: document.getElementById('quizDescription').value,
+            time_limit: document.getElementById('timeLimit').value * 60, // Convert to seconds
+            total_points: document.getElementById('totalPoints').value
+        };
+
+        fetch(`/api/modules/{{ module.id }}/quizzes/create/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(quizData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#createQuizModal').modal('hide');
+            loadQuizzes();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Handle question type change
+    document.getElementById('questionType').addEventListener('change', function() {
+        const choicesContainer = document.getElementById('choicesContainer');
+        if (this.value === 'MCQ') {
+            choicesContainer.style.display = 'block';
+        } else {
+            choicesContainer.style.display = 'none';
+        }
+    });
+
+    // Handle adding choices
+    document.getElementById('addChoiceBtn').addEventListener('click', function() {
+        const choicesList = document.getElementById('choicesList');
+        const choiceDiv = document.createElement('div');
+        choiceDiv.className = 'mb-2';
+        choiceDiv.innerHTML = `
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Choice text">
+                <div class="input-group-text">
+                    <input class="form-check-input" type="radio" name="correctChoice" value="true">
+                </div>
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>
+            </div>
+        `;
+        choicesList.appendChild(choiceDiv);
+    });
+
+    // Handle question addition
+    document.getElementById('addQuestionBtn').addEventListener('click', function() {
+        const questionData = {
+            question_text: document.getElementById('questionText').value,
+            question_type: document.getElementById('questionType').value,
+            points: document.getElementById('questionPoints').value
+        };
+
+        if (questionData.question_type === 'MCQ') {
+            questionData.choices = Array.from(document.querySelectorAll('#choicesList .input-group')).map(group => ({
+                text: group.querySelector('input[type="text"]').value,
+                is_correct: group.querySelector('input[type="radio"]').checked
+            }));
+        }
+
+        fetch(`/api/quizzes/${currentQuizId}/questions/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(questionData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#addQuestionModal').modal('hide');
+            loadQuizzes();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function loadQuizzes() {
+        fetch(`/api/modules/{{ module.id }}/quizzes/`)
+            .then(response => response.json())
+            .then(data => {
+                const quizzesList = document.getElementById('quizzesList');
+                quizzesList.innerHTML = data.quizzes.map(quiz => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${quiz.title}</h5>
+                            <p class="card-text">${quiz.description}</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Time Limit: ${Math.floor(quiz.time_limit / 60)} minutes | 
+                                    Total Points: ${quiz.total_points}
+                                </small>
+                            </p>
+                            <button class="btn btn-primary" onclick="openAddQuestionModal(${quiz.id})">
+                                Add Question
+                            </button>
+                            ${!quiz.is_published ? `
+                                <button class="btn btn-success" onclick="publishQuiz(${quiz.id})">
+                                    Publish Quiz
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function openAddQuestionModal(quizId) {
+        currentQuizId = quizId;
+        $('#addQuestionModal').modal('show');
+    }
+
+    function publishQuiz(quizId) {
+        fetch(`/api/quizzes/${quizId}/publish/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadQuizzes();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %} 

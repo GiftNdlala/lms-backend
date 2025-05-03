@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -14,6 +14,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import './StudentAnnouncementChat.css';
 
 // Mock data for the announcement and comments
 const mockAnnouncement = {
@@ -97,13 +98,37 @@ const StudentAnnouncementChat = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [newComment, setNewComment] = useState('');
-  const announcement = mockAnnouncement; // In real app, fetch based on id
+  const [announcement, setAnnouncement] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch announcement data using the id
+    const fetchAnnouncement = async () => {
+      try {
+        // Simulate API call
+        const mockAnnouncement = {
+          id: id,
+          title: 'Sample Announcement',
+          content: 'This is a sample announcement content.',
+          date: new Date().toISOString(),
+          author: 'Instructor Name'
+        };
+        setAnnouncement(mockAnnouncement);
+      } catch (error) {
+        console.error('Error fetching announcement:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncement();
+  }, [id]);
 
   const handleBack = () => {
     navigate('/dashboard/student/announcements');
   };
 
-  const handleSubmitComment = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
     
@@ -111,6 +136,14 @@ const StudentAnnouncementChat = () => {
     console.log('Submitting comment:', newComment);
     setNewComment('');
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!announcement) {
+    return <div>Announcement not found</div>;
+  }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -164,7 +197,7 @@ const StudentAnnouncementChat = () => {
 
       {/* Comment Input */}
       <Paper sx={{ p: 2, position: 'sticky', bottom: 0, bgcolor: 'background.paper' }}>
-        <form onSubmit={handleSubmitComment}>
+        <form onSubmit={handleSubmit}>
           <Box display="flex" gap={2}>
             <TextField
               fullWidth

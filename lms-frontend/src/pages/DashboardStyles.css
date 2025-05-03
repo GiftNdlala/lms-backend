@@ -241,62 +241,120 @@
   }
   
   .profile-card {
-  background: var(--white);
+  background: white;
     padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(130, 49, 210, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   }
   
-  .profile-card h2 {
-    margin-bottom: 1rem;
-    color: #003366;
-  }
-  
-  .profile-field {
-    margin-bottom: 1.2rem;
-  }
-  
-  .profile-field label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-    color: #333;
-  }
-  
-  .profile-field input {
-    width: 100%;
-    padding: 0.7rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-
-  .tabs {
+  .profile-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
   }
   
-  .tab {
-    background: none;
-    border: none;
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2rem;
+  }
+  
+  .avatar-text {
+    font-size: 2.5rem;
+    color: white;
     font-weight: bold;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 4px;
   }
   
-  .tab.active {
-    background-color: #e6f7ff;
-    border: 1px solid #91d5ff;
+  .student-info {
+    flex: 1;
   }
   
-  .order-select {
-    margin-left: auto;
+  .student-info h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+  
+  .student-id {
+    color: #6b7280;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  .student-email {
+    color: #4f46e5;
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .profile-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .profile-section {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  
+  .profile-section h3 {
+    color: #1f2937;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .profile-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+  }
+
+  .profile-table td {
+    padding: 0.75rem 0;
+    color: #4b5563;
+  }
+  
+  .profile-table td:first-child {
+    font-weight: 500;
+    width: 40%;
+  }
+  
+  .change-password {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .change-password:hover {
+    text-decoration: underline;
+  }
+  
+  .notification-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .notification-link {
+    color: #4f46e5;
+    text-decoration: none;
     font-size: 0.9rem;
+  }
+  
+  .notification-link:hover {
+    text-decoration: underline;
   }
   
   /* ========== GRADE CARDS ========== */
@@ -354,6 +412,668 @@
 /* Apply animations to elements */
 .card, .course-card, .profile-card {
   animation: slideIn 0.5s ease forwards;
+}
+
+/* Course Container Styles */
+.courses-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.courses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.courses-header h2 {
+  font-size: 2rem;
+  color: #333;
+  margin: 0;
+}
+
+.courses-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-box {
+  background: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Course Grid Styles */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.course-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+}
+
+.course-header {
+  margin-bottom: 1rem;
+}
+
+.course-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
+}
+
+.course-code {
+  display: inline-block;
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #495057;
+  margin-top: 0.5rem;
+}
+
+.course-info {
+  margin-bottom: 1rem;
+}
+
+.course-info p {
+  color: #666;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.course-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Progress Bar Styles */
+.course-progress {
+  margin: 1rem 0;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4CAF50;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+/* Button Styles */
+.course-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.primary-button, .secondary-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  flex: 1;
+}
+
+.primary-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.primary-button:hover {
+  background: #43A047;
+}
+
+.secondary-button {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.secondary-button:hover {
+  background: #dee2e6;
+}
+
+/* Empty State Styles */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.empty-state h3 {
+  color: #495057;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Loading and Error States */
+.loading, .error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error-message {
+  color: #dc3545;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .courses-container {
+    padding: 1rem;
+  }
+
+  .courses-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-actions {
+    flex-direction: column;
+  }
+}
+
+/* Course Details Styles */
+.course-details-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.course-header {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.course-title {
+  margin-bottom: 1rem;
+}
+
+.course-title h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 2rem;
+}
+
+.course-meta {
+  display: flex;
+  gap: 2rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.course-progress-section {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.course-progress-section h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.course-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.content-section {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-section h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+/* Module Card Styles */
+.module-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.module-info {
+  flex: 1;
+}
+
+.module-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.module-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.module-status {
+  margin-left: 1rem;
+}
+
+/* Assignment Card Styles */
+.assignment-card {
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.assignment-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.assignment-info p {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.assignment-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge.completed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.submitted {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+/* Grades Section Styles */
+.grades-section {
+  grid-column: 1 / -1;
+}
+
+.grades-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.grade-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.grade-item span {
+  display: block;
+}
+
+.grade-item .grade {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .course-details-container {
+    padding: 1rem;
+  }
+
+  .course-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .module-card, .assignment-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .module-status, .assignment-status {
+    margin-top: 1rem;
+    margin-left: 0;
+  }
+}
+
+/* Assignment Submission Styles */
+.assignment-submission-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.assignment-header {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.assignment-header h2 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.assignment-meta {
+  display: flex;
+  gap: 2rem;
+  color: #666;
+  font-size: 0.875rem;
+  align-items: center;
+}
+
+.overdue-badge {
+  background: #ffebee;
+  color: #c62828;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.assignment-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.assignment-description {
+  margin-bottom: 2rem;
+}
+
+.assignment-description h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.assignment-description p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.submission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.form-group small {
+  color: #666;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.file-upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.file-upload-area:hover {
+  border-color: #4CAF50;
+}
+
+.file-input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.file-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0 0.5rem;
+}
+
+.remove-file:hover {
+  color: #c82333;
+}
+
+.submission-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .assignment-submission-container {
+    padding: 1rem;
+  }
+
+  .assignment-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .submission-actions {
+    flex-direction: column;
+  }
+
+  .submission-actions button {
+    width: 100%;
+  }
+}
+  
+/* Read-only notice styles */
+.read-only-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.info-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+/* Read-only table styles */
+.profile-table.read-only td {
+  background-color: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* Password change button styles */
+.change-password-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-password-btn:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.change-password-btn:active {
+  transform: translateY(0);
+}
+
+/* Notification toggle styles */
+.notification-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+
+.notification-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #4f46e5;
+  border-radius: 4px;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.notification-toggle input[type="checkbox"]::before {
+  content: "";
+  width: 0.875rem;
+  height: 0.875rem;
+  transform: scale(0);
+  transition: transform 0.1s ease-in-out;
+  box-shadow: inset 1rem 1rem #4f46e5;
+  transform-origin: center;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.notification-toggle input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.notification-label {
+  color: #4b5563;
+  font-size: 0.9rem;
 }
   
   

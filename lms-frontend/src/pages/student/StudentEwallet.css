@@ -1,0 +1,68 @@
+.student-ewallet {
+  padding: 20px;
+}
+
+.ewallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ewallet-balance {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ewallet-balance h2 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.ewallet-balance p {
+  margin: 0;
+  color: #666;
+  font-size: 1.2em;
+}
+
+.ewallet-transactions {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ewallet-transactions h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.ewallet-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ewallet-table th,
+.ewallet-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.ewallet-table th {
+  font-weight: 600;
+  color: #666;
+}
+
+.ewallet-table td {
+  color: #333;
+}
+
+.ewallet-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+} 
