@@ -1,0 +1,22 @@
+# CODEOWNERS for LMS Backend
+
+# Dev A - User Model & Profiles
+/dev-a-user-model/ @GiftNdlala
+
+# Dev B - Enrollment
+/dev-b-enrollment/ @SiphaGAS
+
+# Dev C - Instructor-Module & Permissions
+/dev-c-instructor-module/ @Makito-GAS
+
+# Dev D - Dashboard Shell
+/dev-d-dashboard/ @TitusGAS
+
+# Designer A - Dineo
+/des-a-dineo/ @DineoGAS
+
+# Designer B - Tlangelani
+/des-b-tlangelani/ @TlangelaniGAS
+
+# Main branch (shared responsibility)
+/main @Makito-GAS @SiphaGAS @TitusGAS @DineoGAS @TlangelaniGAS

@@ -2,7 +2,8 @@ from rest_framework import serializers
 from accounts.models import Student
 from .models import (
     Module, ModuleContent, StudentModuleProgress, ModuleNotification,
-    NotificationComment, ModuleAssignment, ModuleTest, Assignment, Question, AssignmentSubmission, ModuleTemplate
+    NotificationComment, ModuleAssignment, ModuleTest, Quiz, QuizQuestion, 
+    QuizChoice, QuizAttempt, QuizAnswer, ModuleTemplate, AssignmentSubmission
 )
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -68,14 +69,12 @@ class ModuleSerializer(serializers.ModelSerializer):
         read_only_fields = ['instructor_name', 'contents', 'notifications', 'assignments', 'tests']
 
     def create(self, validated_data):
-        return Module.objects.create(**validated_data)
+        module = Module.objects.create(**validated_data)
+        return module
 
     def update(self, instance, validated_data):
-        instance.code = validated_data.get('code', instance.code)
-        instance.title = validated_data.get('title', instance.title)
-        instance.description = validated_data.get('description', instance.description)
-        instance.duration = validated_data.get('duration', instance.duration)
-        instance.credits = validated_data.get('credits', instance.credits)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
         return instance
 
@@ -83,36 +82,54 @@ class ModuleStudentManagementSerializer(serializers.Serializer):
     student_ids = serializers.ListField(child=serializers.IntegerField())
     action = serializers.ChoiceField(choices=['add', 'remove'])
 
-class QuestionSerializer(serializers.ModelSerializer):
+class QuizChoiceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Question
-        fields = ['id', 'text', 'type', 'answer']
+        model = QuizChoice
+        fields = ['id', 'choice_text', 'is_correct']
 
-class AssignmentSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
-    pdf_file_url = serializers.SerializerMethodField()
+class QuizQuestionSerializer(serializers.ModelSerializer):
+    choices = QuizChoiceSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Assignment
-        fields = ['id', 'title', 'description', 'pdf_file', 'pdf_file_url', 'due_date', 'questions', 'created_at']
+        model = QuizQuestion
+        fields = ['id', 'question_text', 'question_type', 'points', 'order', 'choices']
 
-    def get_pdf_file_url(self, obj):
-        if obj.pdf_file:
-            return self.context['request'].build_absolute_uri(obj.pdf_file.url)
-        return None
+class QuizSerializer(serializers.ModelSerializer):
+    questions = QuizQuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Quiz
+        fields = ['id', 'title', 'description', 'time_limit', 'total_points', 
+                 'is_published', 'questions', 'created_at', 'updated_at']
+
+class QuizAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnswer
+        fields = ['id', 'question', 'answer_text', 'is_correct', 'points_earned']
+
+class QuizAttemptSerializer(serializers.ModelSerializer):
+    answers = QuizAnswerSerializer(many=True, read_only=True)
+    student_name = serializers.CharField(source='student.user.username', read_only=True)
+
+    class Meta:
+        model = QuizAttempt
+        fields = ['id', 'quiz', 'student', 'student_name', 'started_at', 
+                 'completed_at', 'score', 'is_completed', 'answers']
 
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):
-    student_name = serializers.CharField(source='student.get_full_name', read_only=True)
+    student_name = serializers.CharField(source='student.user.username', read_only=True)
     pdf_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = AssignmentSubmission
         fields = ['id', 'assignment', 'student', 'student_name', 'pdf_file', 'pdf_file_url', 
-                 'answers', 'score', 'status', 'submitted_at', 'graded_at']
+                 'submitted_at', 'grade', 'feedback']
+        read_only_fields = ['submitted_at']
 
     def get_pdf_file_url(self, obj):
-        if obj.pdf_file:
-            return self.context['request'].build_absolute_uri(obj.pdf_file.url)
+        request = self.context.get('request')
+        if obj.pdf_file and hasattr(request, 'build_absolute_uri'):
+            return request.build_absolute_uri(obj.pdf_file.url)
         return None
 
 class ModuleTemplateSerializer(serializers.ModelSerializer):

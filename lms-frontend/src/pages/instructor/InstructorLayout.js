@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import LogoText from '../../components/LogoText';
 import './InstructorStyles.css';
-import { DashboardIcon, BookIcon, AssignmentIcon, PeopleIcon, AccountBalanceWalletIcon } from '../../components/icons';
+import { 
+  DashboardIcon, 
+  BookIcon, 
+  AssignmentIcon, 
+  PeopleIcon, 
+  AccountBalanceWalletIcon,
+  EmojiEventsIcon
+} from '../../components/icons';
 
 const menuItems = [
   {
@@ -50,8 +57,13 @@ const menuItems = [
   },
   {
     text: 'Grade Students',
-    icon: <AssignmentIcon />,
+    icon: <EmojiEventsIcon />,
     path: '/dashboard/instructor/grade-students'
+  },
+  {
+    text: 'Announcements',
+    icon: <AssignmentIcon />,
+    path: '/dashboard/instructor/announcements'
   }
 ];
 
@@ -64,7 +76,8 @@ const InstructorLayout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
-    navigate('/logout');
+    localStorage.removeItem('role_data');
+    navigate('/login/instructor');
   };
 
   const toggleSubMenu = (index) => {

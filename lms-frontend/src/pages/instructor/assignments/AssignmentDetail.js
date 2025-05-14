@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -22,13 +22,9 @@ const AssignmentDetail = () => {
   const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchAssignmentDetails();
-  }, [id]);
-
-  const fetchAssignmentDetails = async () => {
+  const fetchAssignmentDetails = useCallback(async () => {
     try {
       setLoading(true);
       const [assignmentResponse, submissionsResponse] = await Promise.all([
@@ -45,13 +41,19 @@ const AssignmentDetail = () => {
       ]);
       setAssignment(assignmentResponse.data);
       setSubmissions(submissionsResponse.data);
-    } catch (error) {
-      console.error('Failed to fetch assignment details:', error);
-      setError('Failed to load assignment details. Please try again later.');
+      setError(null);
+    } catch (err) {
+      setError('Failed to load assignment details');
+      console.error('Error fetching assignment:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchAssignmentDetails();
+  }, [fetchAssignmentDetails]);
 
   const handleGradeSubmission = async (submissionId, score) => {
     try {

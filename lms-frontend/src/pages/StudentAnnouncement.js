@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './StudentPages.css';
+import studentApi from '../services/studentApi';
 
 const StudentAnnouncement = () => {
   const navigate = useNavigate();
@@ -8,16 +9,15 @@ const StudentAnnouncement = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch announcements data
     const fetchAnnouncements = async () => {
       try {
-        // Replace with actual API call
-        const response = await fetch('/api/student/announcements');
-        const data = await response.json();
-        setAnnouncements(data);
-        setLoading(false);
+        const response = await studentApi.getAnnouncements();
+        setAnnouncements(response);
       } catch (error) {
         console.error('Error fetching announcements:', error);
+        // Set default announcements if API call fails
+        setAnnouncements([]);
+      } finally {
         setLoading(false);
       }
     };

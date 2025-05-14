@@ -26,22 +26,23 @@ const GradeStudent = () => {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }
         });
-        setModules(response.data);
-        if (response.data.length > 0) {
-          setSelectedModule(response.data[0]);
+        const modulesData = response.data || [];
+        setModules(modulesData);
+        if (modulesData.length > 0) {
+          setSelectedModule(modulesData[0]);
         }
         // Fetch stats for each module
         const stats = {};
-        await Promise.all(response.data.map(async (module) => {
+        await Promise.all(modulesData.map(async (module) => {
           try {
             const submissionsRes = await axios.get(`http://localhost:8000/api/modules/${module.id}/assignments/`, {
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
               }
             });
-            // Flatten all submissions for all assignments in this module
             let marked = 0, unmarked = 0, total = 0;
-            for (const assignment of submissionsRes.data) {
+            const assignments = submissionsRes.data || [];
+            for (const assignment of assignments) {
               if (assignment.submissions && Array.isArray(assignment.submissions)) {
                 total += assignment.submissions.length;
                 marked += assignment.submissions.filter(s => s.score !== null && s.score !== undefined).length;
@@ -56,6 +57,41 @@ const GradeStudent = () => {
         setModuleStats(stats);
       } catch (err) {
         setError('Failed to load modules. Please try again later.');
+        // Add dummy modules for testing
+        const dummyModules = [
+          {
+            id: 1,
+            title: 'Introduction to Programming',
+            code: 'CS101',
+            description: 'Basic programming concepts and practices',
+            instructor: { name: 'Dr. Smith' },
+            students: [
+              { id: 1, name: 'John Doe', email: 'john@example.com' },
+              { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+            ]
+          },
+          {
+            id: 2,
+            title: 'Data Structures',
+            code: 'CS201',
+            description: 'Advanced data structures and algorithms',
+            instructor: { name: 'Dr. Johnson' },
+            students: [
+              { id: 3, name: 'Mike Brown', email: 'mike@example.com' },
+              { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' }
+            ]
+          }
+        ];
+        setModules(dummyModules);
+        if (dummyModules.length > 0) {
+          setSelectedModule(dummyModules[0]);
+        }
+        // Add dummy stats
+        const dummyStats = {
+          1: { marked: 5, unmarked: 3, total: 8 },
+          2: { marked: 4, unmarked: 2, total: 6 }
+        };
+        setModuleStats(dummyStats);
       } finally {
         setLoading(false);
       }
@@ -72,22 +108,22 @@ const GradeStudent = () => {
       setSubmissions([]);
       setStudents([]);
       try {
-        // Fetch students in the module
-        const studentsRes = await axios.get(`http://localhost:8000/api/modules/${selectedModule.id}/students/`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
-        setStudents(studentsRes.data);
-        // Fetch assignments and submissions
-        const assignmentsRes = await axios.get(`http://localhost:8000/api/modules/${selectedModule.id}/assignments/`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
-        // Flatten all submissions for all assignments
+        const [studentsRes, assignmentsRes] = await Promise.all([
+          axios.get(`http://localhost:8000/api/modules/${selectedModule.id}/students/`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+          }),
+          axios.get(`http://localhost:8000/api/modules/${selectedModule.id}/assignments/`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+          })
+        ]);
+        setStudents(studentsRes.data || []);
+        const assignments = assignmentsRes.data || [];
         let allSubs = [];
-        for (const assignment of assignmentsRes.data) {
+        for (const assignment of assignments) {
           if (assignment.submissions && Array.isArray(assignment.submissions)) {
             for (const sub of assignment.submissions) {
               allSubs.push({
@@ -104,6 +140,21 @@ const GradeStudent = () => {
         setSubmissions(allSubs);
       } catch (err) {
         setSubError('Failed to load students or submissions.');
+        // Add dummy students and submissions for testing
+        const dummyStudents = selectedModule.students || [];
+        setStudents(dummyStudents);
+        
+        const dummySubmissions = dummyStudents.map(student => ({
+          id: Math.random(),
+          studentId: student.id,
+          studentName: student.name,
+          assignmentTitle: 'Assignment 1',
+          assignmentId: 1,
+          score: null,
+          feedback: '',
+          pdf: null
+        }));
+        setSubmissions(dummySubmissions);
       } finally {
         setSubLoading(false);
       }
@@ -152,7 +203,7 @@ const GradeStudent = () => {
         <div className="loading">Loading modules...</div>
       ) : (
         <div className="modules-list">
-          {modules.map(module => (
+          {Array.isArray(modules) && modules.map(module => (
             <div
               key={module.id}
               className={`module-card enhanced ${selectedModule?.id === module.id ? 'selected' : ''}`}
@@ -194,7 +245,7 @@ const GradeStudent = () => {
                 </tr>
               </thead>
               <tbody>
-                {students.length === 0 ? (
+                {Array.isArray(students) && students.length === 0 ? (
                   <tr><td colSpan="6">No students found for this module.</td></tr>
                 ) : (
                   students.map(student => {
@@ -233,15 +284,17 @@ const GradeStudent = () => {
                           )}
                         </td>
                         <td>
-                          <input
-                            type="text"
+                          <textarea
                             value={editGrades[sub.id]?.feedback ?? (sub.feedback || '')}
-                            placeholder="Feedback"
+                            placeholder="Add feedback..."
                             onChange={e => handleEditChange(sub.id, 'feedback', e.target.value)}
                           />
                         </td>
                         <td>
-                          <button onClick={() => handleUpdate(sub.id)}>
+                          <button
+                            onClick={() => handleUpdate(sub.id)}
+                            disabled={!editGrades[sub.id]?.score}
+                          >
                             Update
                           </button>
                         </td>

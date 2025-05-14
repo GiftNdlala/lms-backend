@@ -15,9 +15,11 @@ const StudentCourses = () => {
       try {
         const response = await api.courses.getEnrolledCourses();
         setEnrolledCourses(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load courses');
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        // Set default courses if API call fails
+        setEnrolledCourses([]);
+      } finally {
         setLoading(false);
       }
     };

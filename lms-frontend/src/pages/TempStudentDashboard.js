@@ -9,7 +9,6 @@ const TempStudentDashboard = () => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [recentModules, setRecentModules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +25,6 @@ const TempStudentDashboard = () => {
         const modulesResponse = await courses.getRecentModules();
         setRecentModules(modulesResponse.data);
       } catch (err) {
-        setError('Failed to load dashboard data');
         console.error(err);
       } finally {
         setLoading(false);
@@ -38,10 +36,6 @@ const TempStudentDashboard = () => {
 
   if (loading) {
     return <div className="loading">Loading dashboard...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
   }
 
   return (

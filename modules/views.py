@@ -11,12 +11,12 @@ from django.utils import timezone
 from accounts.models import Student
 from .models import (
     Module, ModuleContent, StudentModuleProgress, ModuleNotification,
-    NotificationComment, ModuleAssignment, ModuleTest, Quiz, QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer
+    NotificationComment, ModuleAssignment, ModuleTest, Quiz, QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer, AssignmentSubmission
 )
 from .serializers import (
     ModuleSerializer, ModuleContentSerializer, ModuleStudentManagementSerializer,
     StudentSerializer, ModuleNotificationSerializer, NotificationCommentSerializer,
-    ModuleAssignmentSerializer, ModuleTestSerializer
+    ModuleAssignmentSerializer, ModuleTestSerializer, AssignmentSubmissionSerializer
 )
 import mimetypes
 from django.contrib.auth.decorators import login_required
@@ -33,7 +33,9 @@ class ModuleViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if hasattr(user, 'instructor'):
             return Module.objects.filter(instructor=user.instructor)
-        raise PermissionDenied("Only instructors can access modules")
+        elif hasattr(user, 'student'):
+            return Module.objects.filter(students=user.student)
+        return Module.objects.none()
 
     def create(self, request, *args, **kwargs):
         if not hasattr(request.user, 'instructor'):
@@ -94,57 +96,52 @@ class ModuleViewSet(viewsets.ModelViewSet):
             parser_classes=[MultiPartParser, FormParser])
     def contents(self, request, pk=None):
         module = self.get_object()
+        contents = module.contents.all()
+        serializer = ModuleContentSerializer(contents, many=True, context={'request': request})
+        return Response(serializer.data)
 
-        if request.method == 'GET':
-            contents = module.contents.all()
-            serializer = ModuleContentSerializer(contents, many=True, context={'request': request})
-            return Response(serializer.data)
+    @action(detail=True, methods=['get'])
+    def notifications(self, request, pk=None):
+        module = self.get_object()
+        notifications = module.notifications.all()
+        serializer = ModuleNotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
 
-        elif request.method == 'POST':
-            file_obj = request.FILES.get('file')
-            if not file_obj:
-                return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['get'])
+    def assignments(self, request, pk=None):
+        module = self.get_object()
+        assignments = module.assignments.all()
+        serializer = ModuleAssignmentSerializer(assignments, many=True)
+        return Response(serializer.data)
 
-            # Get file type
-            content_type = file_obj.content_type
-            if content_type.startswith('video/'):
-                file_type = 'video'
-            elif content_type.startswith('audio/'):
-                file_type = 'audio'
-            elif content_type == 'application/pdf':
-                file_type = 'pdf'
-            elif content_type in ['application/msword', 
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
-                file_type = 'document'
-            else:
-                return Response({'error': 'Unsupported file type'}, 
-                              status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['get'])
+    def tests(self, request, pk=None):
+        module = self.get_object()
+        tests = module.tests.all()
+        serializer = ModuleTestSerializer(tests, many=True)
+        return Response(serializer.data)
 
-            content_data = {
-                'module': module,
-                'title': request.data.get('title', file_obj.name),
-                'file': file_obj,
-                'file_type': file_type,
-                'uploaded_by': request.user
-            }
-
-            content = ModuleContent.objects.create(**content_data)
-            serializer = ModuleContentSerializer(content, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        elif request.method == 'DELETE':
-            content_id = request.query_params.get('content_id')
-            if not content_id:
-                return Response({'error': 'content_id is required'}, 
-                              status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                content = module.contents.get(id=content_id)
-                content.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            except ModuleContent.DoesNotExist:
-                return Response({'error': 'Content not found'}, 
-                              status=status.HTTP_404_NOT_FOUND)
+    @action(detail=True, methods=['get'])
+    def progress(self, request, pk=None):
+        module = self.get_object()
+        if not module.students.filter(id=request.user.student.id).exists():
+            raise PermissionDenied("You are not enrolled in this module")
+        
+        total_contents = module.contents.count()
+        completed_contents = StudentModuleProgress.objects.filter(
+            student=request.user.student,
+            module=module,
+            completed=True
+        ).count()
+        
+        progress_percentage = (completed_contents / total_contents * 100) if total_contents > 0 else 0
+        
+        return Response({
+            'module_id': module.id,
+            'total_contents': total_contents,
+            'completed_contents': completed_contents,
+            'progress_percentage': round(progress_percentage, 2)
+        })
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
@@ -253,13 +250,11 @@ class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
     def mark_content_complete(self, request, pk=None):
         module = self.get_object()
         content_id = request.data.get('content_id')
-        
         if not content_id:
             return Response(
                 {'error': 'content_id is required'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
         try:
             content = module.contents.get(id=content_id)
             progress, created = StudentModuleProgress.objects.get_or_create(
@@ -268,12 +263,10 @@ class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
                 content=content,
                 defaults={'completed': True, 'completed_at': timezone.now()}
             )
-            
             if not created and not progress.completed:
                 progress.completed = True
                 progress.completed_at = timezone.now()
                 progress.save()
-            
             return Response({
                 'message': 'Content marked as completed',
                 'progress': {
@@ -290,6 +283,24 @@ class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': 'Content not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    @action(detail=True, methods=['post'], url_path='assignments/(?P<assignment_id>[^/.]+)/submit', parser_classes=[MultiPartParser, FormParser])
+    def submit_assignment(self, request, pk=None, assignment_id=None):
+        module = self.get_object()
+        if not module.students.filter(id=request.user.student.id).exists():
+            raise PermissionDenied("You are not enrolled in this module")
+        try:
+            assignment = module.assignments.get(id=assignment_id)
+        except ModuleAssignment.DoesNotExist:
+            return Response({'error': 'Assignment not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Check if already submitted
+        if AssignmentSubmission.objects.filter(assignment=assignment, student=request.user.student).exists():
+            return Response({'error': 'You have already submitted this assignment'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = AssignmentSubmissionSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(student=request.user.student, assignment=assignment)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

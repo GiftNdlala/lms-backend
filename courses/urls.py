@@ -5,11 +5,9 @@ from . import views
 # Main router for courses
 router = DefaultRouter()
 router.register(r'', views.CourseViewSet, basename='courses')
+router.register(r'modules', views.ModuleViewSet, basename='modules')
 
 # Nested routers for course-related resources
-module_router = DefaultRouter()
-module_router.register(r'modules', views.ModuleViewSet, basename='modules')
-
 lesson_router = DefaultRouter()
 lesson_router.register(r'lessons', views.LessonViewSet, basename='lessons')
 
@@ -42,7 +40,6 @@ urlpatterns = [
     
     # Nested routes for a specific course
     path('<int:course_pk>/', include([
-        path('', include(module_router.urls)),
         path('modules/<int:module_pk>/', include([
             path('', include(lesson_router.urls)),
             path('lessons/<int:lesson_pk>/', include([

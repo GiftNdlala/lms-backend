@@ -6,7 +6,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.renderers import JSONRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .renderers import CustomBrowsableAPIRenderer
@@ -22,6 +22,7 @@ from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.exceptions import TokenError
 
 # Create your views here.
 
@@ -264,34 +265,121 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         print(f"Login response: {response.data}")  # Debug print
         return response
 
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        print("Token refresh attempt - Request data:", request.data)  # Debug print
+        try:
+            response = super().post(request, *args, **kwargs)
+            print("Token refresh successful")  # Debug print
+            return response
+        except TokenError as e:
+            print(f"Token refresh error: {str(e)}")  # Debug print
+            return Response(
+                {'detail': 'Token is invalid or expired'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as e:
+            print(f"Unexpected error during token refresh: {str(e)}")  # Debug print
+            import traceback
+            print(traceback.format_exc())  # Print full traceback
+            return Response(
+                {'detail': 'An error occurred during token refresh'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
     try:
-        serializer = LoginSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-        user = serializer.validated_data['user']
-        refresh = RefreshToken.for_user(user)
+        print("Raw request data:", request.data)  # Log raw request data
+        print("Request content type:", request.content_type)  # Log content type
         
-        # Update last login time
-        if hasattr(user, 'student'):
-            user.student.last_login_at = timezone.now()
-            user.student.save()
-        elif hasattr(user, 'instructor'):
-            user.instructor.last_login_at = timezone.now()
-            user.instructor.save()
+        email = request.data.get('email', '').strip().lower()  # Convert to lowercase and strip whitespace
+        password = request.data.get('password')
+        role = request.data.get('role')
 
-        # Prepare response data
-        token_data = {
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': UserSerializer(user).data,
-        }
-        
-        return Response(token_data, status=status.HTTP_200_OK)
+        print(f"Login attempt - Email: {email}, Role: {role}")  # Debug print
+
+        if not email or not password or not role:
+            print(f"Missing fields - Email: {bool(email)}, Password: {bool(password)}, Role: {bool(role)}")  # Debug print
+            return Response(
+                {'detail': 'Email, password, and role are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # First, find all users with this email and role
+        users = User.objects.filter(email__iexact=email, role=role).order_by('-date_joined')
+        print(f"Found {users.count()} users with email {email} and role {role}")  # Debug print
+
+        if not users.exists():
+            print(f"No user found with email: {email} and role: {role}")  # Debug print
+            return Response(
+                {'detail': 'Invalid credentials'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Try each user until we find one with the correct password
+        for user in users:
+            if user.check_password(password):
+                print(f"Found matching user: {user.username}, Role: {user.role}")  # Debug print
+                
+                # For instructors, check if they have an instructor profile
+                if role == 'instructor':
+                    print("Checking instructor profile...")  # Debug print
+                    try:
+                        instructor = user.instructor
+                        print(f"Found instructor profile: {instructor.employee_id}")  # Debug print
+                    except Instructor.DoesNotExist:
+                        print("No instructor profile found")  # Debug print
+                        continue  # Try next user if this one doesn't have an instructor profile
+                    except Exception as e:
+                        print(f"Error checking instructor profile: {str(e)}")  # Debug print
+                        return Response(
+                            {'detail': 'Error checking instructor profile'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
+
+                # Generate tokens
+                refresh = RefreshToken.for_user(user)
+                print(f"Generated refresh token: {str(refresh)}")  # Debug print
+                
+                # Update last login time
+                if hasattr(user, 'student'):
+                    user.student.last_login_at = timezone.now()
+                    user.student.save()
+                elif hasattr(user, 'instructor'):
+                    user.instructor.last_login_at = timezone.now()
+                    user.instructor.save()
+
+                # Get role-specific data
+                role_data = None
+                if hasattr(user, 'student'):
+                    role_data = StudentSerializer(user.student).data
+                elif hasattr(user, 'instructor'):
+                    role_data = InstructorSerializer(user.instructor).data
+
+                # Prepare response data
+                token_data = {
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'user': UserSerializer(user).data,
+                    'role_data': role_data
+                }
+                
+                print(f"Login successful for {email}")  # Debug print
+                return Response(token_data, status=status.HTTP_200_OK)
+
+        # If we get here, no user had the correct password
+        print("No user found with correct password")  # Debug print
+        return Response(
+            {'detail': 'Invalid credentials'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
     except Exception as e:
+        print(f"Login error: {str(e)}")  # Debug print
+        import traceback
+        print(traceback.format_exc())  # Print full traceback
         return Response(
             {'detail': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

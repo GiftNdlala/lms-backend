@@ -69,7 +69,7 @@ const AssignStudent = () => {
               checked={assigned.includes(student.id)}
               onChange={() => handleCheck(student.id)}
             />
-            <label htmlFor={`student-${student.id}">
+            <label htmlFor={`student-${student.id}`}>
               {student.user?.first_name || student.first_name} {student.user?.last_name || student.last_name}
             </label>
           </div>

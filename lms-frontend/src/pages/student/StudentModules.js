@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './ModuleStyles.css';
 import { FaBook, FaCalendarAlt, FaUserTie } from 'react-icons/fa';
@@ -12,7 +11,7 @@ const StudentModules = () => {
     completedModules: 0,
     upcomingAssignments: 0
   });
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -71,8 +70,27 @@ const StudentModules = () => {
       </div>
 
       <div className="modules-grid">
+        {/* Dummy module card for New Venture Creation */}
+        <div className="module-card" onClick={() => navigate('/dashboard/student/modules/new-venture-creation')} style={{ cursor: 'pointer', border: '2px solid #6c63ff' }}>
+          <div className="module-card-header">
+            <span className="module-code">NVC2025_1</span>
+          </div>
+          <div>
+            <h2>New Venture Creation</h2>
+            <p className="instructor">
+              <span role="img" aria-label="instructor">👤</span> SIHLE MOYO
+            </p>
+          </div>
+          <div className="module-progress">
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `0%` }} />
+            </div>
+            <span className="progress-text">0% Complete</span>
+          </div>
+        </div>
+        {/* Render other modules as before */}
         {modules.map((module) => (
-          <div key={module._id} className="module-card">
+          <div key={module._id} className="module-card" onClick={() => navigate(`/dashboard/student/modules/${module._id}`)} style={{ cursor: 'pointer' }}>
             <div className="module-card-header">
               <span className="module-code">{module.code}</span>
               {module.notifications > 0 && (
@@ -81,7 +99,6 @@ const StudentModules = () => {
                 </span>
               )}
             </div>
-
             <div>
               <h2>{module.title}</h2>
               <p className="instructor">
@@ -89,19 +106,12 @@ const StudentModules = () => {
                 {module.instructor.name}
               </p>
             </div>
-
             <div className="module-progress">
               <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${module.progress}%` }}
-                />
+                <div className="progress-fill" style={{ width: `${module.progress}%` }} />
               </div>
-              <span className="progress-text">
-                {module.progress}% Complete
-              </span>
+              <span className="progress-text">{module.progress}% Complete</span>
             </div>
-
             {module.nextAssignment && (
               <div className="next-assignment">
                 <h3>Next Assignment</h3>
@@ -112,20 +122,13 @@ const StudentModules = () => {
                 </span>
               </div>
             )}
-
             <div className="module-card-actions">
-              <Link 
-                to={`/student/modules/${module._id}`}
-                className="view-module-btn"
-              >
+              <Link to={`/student/modules/${module._id}`} className="view-module-btn">
                 <FaBook style={{ marginRight: '0.5rem' }} />
                 View Module
               </Link>
               {module.notifications > 0 && (
-                <Link 
-                  to={`/student/modules/${module._id}/notifications`}
-                  className="view-notifications-btn"
-                >
+                <Link to={`/student/modules/${module._id}/notifications`} className="view-notifications-btn">
                   View Updates
                 </Link>
               )}

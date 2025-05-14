@@ -5,7 +5,9 @@ from decimal import Decimal
 
 class Module(models.Model):
     title = models.CharField(max_length=200)
+    code = models.CharField(max_length=20, unique=True, help_text="Unique module code (e.g., MOD101)", null=True, blank=True)
     description = models.TextField()
+    credits = models.PositiveIntegerField(default=0, help_text="Number of credits for this module", null=True, blank=True)
     instructor = models.ForeignKey(Instructor, on_delete=models.SET_NULL, related_name='created_modules', null=True, blank=True)
     students = models.ManyToManyField(Student, through='ModuleEnrollment', related_name='course_module_enrollments')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -13,7 +15,7 @@ class Module(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.code} - {self.title}" if self.code else self.title
 
 class ModuleEnrollment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

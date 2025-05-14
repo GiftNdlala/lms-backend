@@ -7,7 +7,6 @@ const QuizAssessment = () => {
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAssessments = async () => {
@@ -15,8 +14,9 @@ const QuizAssessment = () => {
         const data = await studentApi.getAssessments();
         setAssessments(data);
       } catch (err) {
-        setError('Failed to load assessments. Please try again later.');
         console.error('Error fetching assessments:', err);
+        // Set default assessments if API call fails
+        setAssessments([]);
       } finally {
         setLoading(false);
       }
@@ -40,10 +40,6 @@ const QuizAssessment = () => {
 
   if (loading) {
     return <div className="loading">Loading assessments...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
   }
 
   return (

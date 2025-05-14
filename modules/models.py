@@ -106,6 +106,20 @@ class ModuleAssignment(models.Model):
     class Meta:
         ordering = ['-due_date']
 
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(ModuleAssignment, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='assignment_submissions')
+    pdf_file = models.FileField(upload_to='assignment_submissions/')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    grade = models.PositiveIntegerField(null=True, blank=True)
+    feedback = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.assignment.title}"
+
+    class Meta:
+        ordering = ['-submitted_at']
+
 class ModuleTest(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='tests')
     title = models.CharField(max_length=200)

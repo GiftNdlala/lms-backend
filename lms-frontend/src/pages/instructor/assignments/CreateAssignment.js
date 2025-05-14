@@ -5,91 +5,109 @@ import {
   Typography,
   TextField,
   Button,
+  Grid,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   CircularProgress,
-  Alert,
-  Grid
+  Alert
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CreateAssignment = () => {
-  const [modules, setModules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     module: '',
     due_date: '',
-    pdf_file: null
+    total_marks: 100,
+    file: null
   });
+  const [modules, setModules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/modules/', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
+        setModules(response.data || []);
+      } catch (err) {
+        setError('Failed to load modules');
+        setModules([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchModules();
   }, []);
 
-  const fetchModules = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/modules/', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-      setModules(response.data);
-    } catch (error) {
-      console.error('Failed to fetch modules:', error);
-      setError('Failed to load modules. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      pdf_file: e.target.files[0]
-    });
+    const file = e.target.files[0];
+    if (file) {
+      // Check file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please upload a PDF or Word document');
+        return;
+      }
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size should be less than 10MB');
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        file: file
+      }));
+      setError('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setUploading(true);
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
       formDataToSend.append('description', formData.description);
+      formDataToSend.append('module', formData.module);
       formDataToSend.append('due_date', formData.due_date);
-      if (formData.pdf_file) {
-        formDataToSend.append('pdf_file', formData.pdf_file);
+      formDataToSend.append('total_marks', formData.total_marks);
+      if (formData.file) {
+        formDataToSend.append('file', formData.file);
       }
 
-      await axios.post(
-        `http://localhost:8000/api/modules/${formData.module}/assignments/`,
-        formDataToSend,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Content-Type': 'multipart/form-data'
-          }
+      await axios.post('http://localhost:8000/api/assignments/', formDataToSend, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'multipart/form-data'
         }
-      );
-
+      });
       navigate('/dashboard/instructor/assignments');
-    } catch (error) {
-      console.error('Failed to create assignment:', error);
-      setError('Failed to create assignment. Please try again.');
+    } catch (err) {
+      setError('Failed to create assignment');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -147,7 +165,7 @@ const CreateAssignment = () => {
                   onChange={handleChange}
                   label="Module"
                 >
-                  {modules.map((module) => (
+                  {Array.isArray(modules) && modules.map((module) => (
                     <MenuItem key={module.id} value={module.id}>
                       {module.title}
                     </MenuItem>
@@ -163,7 +181,20 @@ const CreateAssignment = () => {
                 type="datetime-local"
                 value={formData.due_date}
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
+                required
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Total Marks"
+                name="total_marks"
+                type="number"
+                value={formData.total_marks}
+                onChange={handleChange}
                 required
               />
             </Grid>
@@ -171,18 +202,19 @@ const CreateAssignment = () => {
               <Button
                 variant="outlined"
                 component="label"
+                sx={{ mb: 2 }}
               >
-                Upload PDF
+                Upload Assignment File
                 <input
                   type="file"
                   hidden
-                  accept=".pdf"
+                  accept=".pdf,.doc,.docx"
                   onChange={handleFileChange}
                 />
               </Button>
-              {formData.pdf_file && (
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  Selected file: {formData.pdf_file.name}
+              {formData.file && (
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Selected file: {formData.file.name}
                 </Typography>
               )}
             </Grid>
@@ -191,8 +223,10 @@ const CreateAssignment = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
+                size="large"
+                disabled={uploading}
               >
-                Create Assignment
+                {uploading ? 'Creating...' : 'Create Assignment'}
               </Button>
             </Grid>
           </Grid>

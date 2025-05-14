@@ -69,22 +69,6 @@ const studentApi = {
     return response.data;
   },
 
-  // Messages
-  getMessages: async () => {
-    const response = await api.get('/student/messages/');
-    return response.data;
-  },
-
-  getMessageThread: async (threadId) => {
-    const response = await api.get(`/student/messages/${threadId}/`);
-    return response.data;
-  },
-
-  sendMessage: async (threadId, content) => {
-    const response = await api.post(`/student/messages/${threadId}/`, { content });
-    return response.data;
-  },
-
   // Announcements
   getAnnouncements: async () => {
     const response = await api.get('/student/announcements/');

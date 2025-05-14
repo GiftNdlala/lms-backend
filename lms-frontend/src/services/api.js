@@ -8,7 +8,6 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
 // Request interceptor for adding auth token
@@ -37,6 +36,10 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
         const response = await axios.post(`${BASE_URL}/auth/token/refresh/`, {
           refresh: refreshToken,
         });
@@ -51,6 +54,8 @@ api.interceptors.response.use(
         // If refresh token is invalid, logout the user
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role_data');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
@@ -244,10 +249,15 @@ export const quizzes = {
 export const auth = {
   login: async (credentials) => {
     try {
-      const response = await api.post('/auth/token/', credentials);
-      const { access, refresh } = response.data;
+      const response = await api.post('/accounts/login/', credentials);
+      const { access, refresh, user, role_data } = response.data;
+      
+      // Store tokens and user data
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('role_data', JSON.stringify(role_data));
+      
       return response.data;
     } catch (error) {
       console.error('Login error:', error);
@@ -258,20 +268,25 @@ export const auth = {
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role_data');
+    window.location.href = '/login';
   },
 
-  refreshToken: async () => {
-    try {
-      const refresh = localStorage.getItem('refresh_token');
-      const response = await api.post('/auth/token/refresh/', { refresh });
-      const { access } = response.data;
-      localStorage.setItem('access_token', access);
-      return access;
-    } catch (error) {
-      console.error('Token refresh error:', error);
-      throw error;
-    }
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    const roleDataStr = localStorage.getItem('role_data');
+    if (!userStr || !roleDataStr) return null;
+    
+    return {
+      user: JSON.parse(userStr),
+      roleData: JSON.parse(roleDataStr)
+    };
   },
+
+  isAuthenticated: () => {
+    return !!localStorage.getItem('access_token');
+    }
 };
 
 export const instructor = {
