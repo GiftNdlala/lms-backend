@@ -9,12 +9,15 @@ const EditModule = () => {
   const [moduleData, setModuleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [students, setStudents] = useState([]);
 
   useEffect(() => {
     const fetchModule = async () => {
       try {
         const data = await instructorApi.getModuleDetails(moduleId);
         setModuleData(data);
+        const studentsData = await instructorApi.getModuleStudents(moduleId);
+        setStudents(studentsData);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -43,12 +46,22 @@ const EditModule = () => {
   }
 
   return (
-    <ModuleForm
-      initialData={moduleData}
-      onSubmit={handleSubmit}
-      submitButtonText="Update Module"
-      isEditing={true}
-    />
+    <div>
+      <ModuleForm
+        initialData={moduleData}
+        onSubmit={handleSubmit}
+        submitButtonText="Update Module"
+        isEditing={true}
+      />
+      <div>
+        <h3>Manage Students</h3>
+        <ul>
+          {students.map(student => (
+            <li key={student.id}>{student.name}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 

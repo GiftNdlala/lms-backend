@@ -75,6 +75,28 @@ const instructorApi = {
     }
   },
 
+  getModuleStudents: async (moduleId) => {
+    try {
+      const response = await api.get(`/modules/instructor/modules/${moduleId}/students/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching module students:', error);
+      throw error;
+    }
+  },
+
+  updateModuleStudents: async (moduleId, studentIds) => {
+    try {
+      const response = await api.put(`/modules/instructor/modules/${moduleId}/students/`, {
+        student_ids: studentIds
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating module students:', error);
+      throw error;
+    }
+  },
+
   createModule: async (moduleData) => {
     try {
       const response = await api.post('/modules/instructor/modules/', moduleData);

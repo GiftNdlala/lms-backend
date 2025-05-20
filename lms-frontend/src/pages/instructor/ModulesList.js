@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaBook, FaUsers } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaBook } from 'react-icons/fa';
 import instructorApi from '../../services/instructorApi';
 import './InstructorStyles.css';
 
@@ -27,10 +27,10 @@ const ModulesList = () => {
       const dummyModules = [
         {
           id: 1,
-          title: 'Introduction to Programming',
-          code: 'CS101',
-          description: 'Basic programming concepts and practices',
-          instructor: { name: 'Dr. Smith' },
+          title: 'Solar Auditing',
+          code: 'SA101',
+          description: 'Learn about solar energy auditing techniques and practices.',
+          instructor: { name: 'Dr. Tevin Memla' },
           students: [
             { id: 1, name: 'John Doe', email: 'john@example.com' },
             { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
@@ -38,23 +38,17 @@ const ModulesList = () => {
           content: [
             {
               id: 1,
-              title: 'Getting Started with Programming',
+              title: 'Introduction to Solar Energy',
               type: 'lecture',
-              description: 'Introduction to basic programming concepts'
-            },
-            {
-              id: 2,
-              title: 'Variables and Data Types',
-              type: 'lecture',
-              description: 'Understanding different data types and variables'
+              description: 'Overview of solar energy and its applications'
             }
           ]
         },
         {
           id: 2,
-          title: 'Data Structures',
-          code: 'CS201',
-          description: 'Advanced data structures and algorithms',
+          title: 'New Venture Creation',
+          code: 'NVC201',
+          description: 'Explore the fundamentals of creating and managing new business ventures.',
           instructor: { name: 'Dr. Johnson' },
           students: [
             { id: 3, name: 'Mike Brown', email: 'mike@example.com' },
@@ -63,23 +57,17 @@ const ModulesList = () => {
           content: [
             {
               id: 1,
-              title: 'Arrays and Linked Lists',
+              title: 'Business Model Canvas',
               type: 'lecture',
-              description: 'Understanding basic data structures'
-            },
-            {
-              id: 2,
-              title: 'Trees and Graphs',
-              type: 'lecture',
-              description: 'Advanced data structures and their applications'
+              description: 'Understanding the business model canvas and its components'
             }
           ]
         },
         {
           id: 3,
-          title: 'Web Development',
-          code: 'CS301',
-          description: 'Modern web development technologies and practices',
+          title: 'Intro Into Renewable Energy',
+          code: 'IRE301',
+          description: 'An introduction to various renewable energy sources and their impact on the environment.',
           instructor: { name: 'Dr. Williams' },
           students: [
             { id: 5, name: 'Alex Turner', email: 'alex@example.com' },
@@ -88,15 +76,9 @@ const ModulesList = () => {
           content: [
             {
               id: 1,
-              title: 'HTML and CSS Fundamentals',
+              title: 'Types of Renewable Energy',
               type: 'lecture',
-              description: 'Building the structure and style of web pages'
-            },
-            {
-              id: 2,
-              title: 'JavaScript Basics',
-              type: 'lecture',
-              description: 'Introduction to JavaScript programming'
+              description: 'Overview of different renewable energy sources'
             }
           ]
         }
@@ -140,7 +122,7 @@ const ModulesList = () => {
               <div className="module-card-body">
                 <p>{module.description}</p>
                 <div className="module-meta">
-                  <span>Instructor: {module.instructor?.name || 'Not assigned'}</span>
+                <span>Instructor: {module.instructor_name ? module.instructor_name : 'Not assigned'}</span>
                   <span>Students: {module.students?.length || 0}</span>
                 </div>
               </div>
@@ -151,13 +133,6 @@ const ModulesList = () => {
                   onClick={() => navigate(`/dashboard/instructor/modules/${module.id}/content`)}
                 >
                   <FaBook /> Manage Content
-                </button>
-                <button
-                  className="icon-button"
-                  title="Manage Students"
-                  onClick={() => navigate(`/dashboard/instructor/modules/${module.id}/assign-students`)}
-                >
-                  <FaUsers /> Manage Students
                 </button>
                 <button
                   className="icon-button"

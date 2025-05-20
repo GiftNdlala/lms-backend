@@ -12,7 +12,7 @@ function ModulesList() {
     const fetchModules = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/api/modules/');
+        const response = await api.get('/modules/student/modules/');
         setModules(response.data);
         setLoading(false);
       } catch (err) {

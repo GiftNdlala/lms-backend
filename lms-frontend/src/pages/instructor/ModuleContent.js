@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaFile, FaVideo, FaFileAudio, FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaTrash } from 'react-icons/fa';
-import api from '../../services/api';
+import instructorApi from '../../services/instructorApi';
 import './ModuleContent.css';
 
 const ModuleContent = () => {
@@ -14,9 +14,9 @@ const ModuleContent = () => {
 
   const fetchModuleData = useCallback(async () => {
     try {
-      const moduleData = await api.instructor.getModuleDetails(moduleId);
+      const moduleData = await instructorApi.getModuleDetails(moduleId);
       setModule(moduleData);
-      const contentData = await api.instructor.getModuleContent(moduleId);
+      const contentData = await instructorApi.getModuleContent(moduleId);
       setContents(contentData);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load module data' });
@@ -58,7 +58,7 @@ const ModuleContent = () => {
     }
 
     try {
-      await api.instructor.addModuleContent(moduleId, formData);
+      await instructorApi.addModuleContent(moduleId, formData);
       setMessage({ type: 'success', text: 'Files uploaded successfully' });
       fetchModuleData();
     } catch (error) {
@@ -72,7 +72,7 @@ const ModuleContent = () => {
     if (!window.confirm('Are you sure you want to delete this content?')) return;
 
     try {
-      await api.instructor.deleteModuleContent(moduleId, contentId);
+      await instructorApi.deleteModuleContent(moduleId, contentId);
       setMessage({ type: 'success', text: 'Content deleted successfully' });
       fetchModuleData();
     } catch (error) {
@@ -85,7 +85,7 @@ const ModuleContent = () => {
     if (!newAnnouncement.trim()) return;
 
     try {
-      await api.instructor.addModuleAnnouncement(moduleId, { text: newAnnouncement });
+      await instructorApi.addModuleAnnouncement(moduleId, { text: newAnnouncement });
       setMessage({ type: 'success', text: 'Announcement posted successfully' });
       setNewAnnouncement('');
       fetchModuleData();

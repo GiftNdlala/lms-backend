@@ -15,7 +15,7 @@ const AddModule = () => {
       }
 
       // For non-template modules, validate duration and credits
-      if (!formData.isTemplate) {
+      if (!formData.isTemplate) { 
         if (!formData.duration || !formData.credits) {
           throw new Error('Duration and credits are required for non-template modules');
         }
@@ -38,7 +38,7 @@ const AddModule = () => {
       console.log('Module created successfully:', response);
       
       // Navigate to modules list on success
-      navigate('/instructor/modules');
+      navigate('/dashboard/instructor/modules');
     } catch (error) {
       console.error('Error creating module:', error);
       throw error;

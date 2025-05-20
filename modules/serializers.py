@@ -58,6 +58,7 @@ class ModuleSerializer(serializers.ModelSerializer):
     assignments = ModuleAssignmentSerializer(many=True, read_only=True)
     tests = ModuleTestSerializer(many=True, read_only=True)
     instructor_name = serializers.CharField(source='instructor.user.username', read_only=True)
+    instructor = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Module
