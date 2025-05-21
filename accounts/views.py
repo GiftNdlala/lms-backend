@@ -1,3 +1,6 @@
+from ast import Module
+from typing import Self
+from urllib import request
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
@@ -23,9 +26,26 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.exceptions import TokenError
+#from .serializers import ModuleSerializer
+
 
 # Create your views here.
 
+"""class ModuleViewSet(viewsets.ModelViewSet):
+    queryset = Module.objects.all()
+    serializer_class = ModuleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = ModuleSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as e:
+            print("Validation error:", e.detail)
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)"""
+        
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -70,6 +90,23 @@ class StudentViewSet(viewsets.ModelViewSet):
         elif user.role == 'student':
             return Student.objects.filter(user=user)
         return Student.objects.none()
+    
+    @action(detail=True, methods=["PUT"])  #Directly above function
+    def update_profile(self, request, pk=None):
+        """Update student profile information"""
+
+        try:
+            student = self.get_object()  #Fixed capitalization
+            serializer = StudentSerializer(student, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Profile updated successfully", "data": serializer.data})  #Fixed indentation
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['get'])
     def list_all(self, request):
@@ -125,6 +162,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         from courses.serializers import EnrollmentSerializer
         serializer = EnrollmentSerializer(enrollment)
         return Response(serializer.data)
+
 
 class InstructorViewSet(viewsets.ModelViewSet):
     queryset = Instructor.objects.all()

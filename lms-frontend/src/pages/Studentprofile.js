@@ -39,7 +39,7 @@ function StudentProfile() {
 
     fetchProfile();
   }, []);
-
+  
   return (
     <div className="student-profile-container">
       <div className="profile-card">

@@ -5,6 +5,7 @@ from .models import User, Student, Instructor
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = User.EMAIL_FIELD  # Use email for authentication
 

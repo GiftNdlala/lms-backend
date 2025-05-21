@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+import modules.views
+from djoser.views import UserViewSet
+
 from accounts.models import Student
 from .models import (
     Module, ModuleContent, StudentModuleProgress, ModuleNotification,
@@ -35,7 +38,7 @@ class ModuleViewSet(viewsets.ModelViewSet):
             return Module.objects.filter(instructor=user.instructor)
         elif hasattr(user, 'student'):
             return Module.objects.filter(students=user.student)
-        return Module.objects.none()
+        return Module.objects.all() # Debugging Step
 
     def create(self, request, *args, **kwargs):
         if not hasattr(request.user, 'instructor'):

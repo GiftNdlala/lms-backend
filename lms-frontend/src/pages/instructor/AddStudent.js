@@ -81,7 +81,7 @@ const AddStudent = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       newErrors.email = 'Please enter a valid email address';
     }
@@ -93,6 +93,7 @@ const AddStudent = () => {
     if (formData.first_name.length < 2) {
       newErrors.first_name = 'First name must be at least 2 characters';
     }
+
     if (formData.last_name.length < 2) {
       newErrors.last_name = 'Last name must be at least 2 characters';
     }
@@ -111,12 +112,12 @@ const AddStudent = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: ''
       }));
@@ -125,11 +126,11 @@ const AddStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      setMessage({ 
-        type: 'error', 
-        text: 'Please correct the errors in the form' 
+      setMessage({
+        type: 'error',
+        text: 'Please correct the errors in the form'
       });
       return;
     }
@@ -139,9 +140,9 @@ const AddStudent = () => {
 
     try {
       await instructorApi.addStudent(formData);
-      setMessage({ 
-        type: 'success', 
-        text: `Student ${formData.first_name} ${formData.last_name} has been successfully added!` 
+      setMessage({
+        type: 'success',
+        text: `Student ${formData.first_name} ${formData.last_name} has been successfully added!`
       });
       setFormData({
         email: '',
@@ -153,9 +154,9 @@ const AddStudent = () => {
       });
       fetchStudents();
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.detail || 'Error adding student. Please check the information and try again.' 
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.detail || 'Error adding student. Please check the information and try again.'
       });
     } finally {
       setLoading(false);
@@ -165,8 +166,8 @@ const AddStudent = () => {
   return (
     <div className="add-student-page">
       <div className="add-student-form">
-        <h1>Add New Student</h1>
-        
+        <h1>Add New GAS Student</h1>
+
         {message.text && (
           <div className={`message ${message.type}`}>
             {message.text}
@@ -275,44 +276,46 @@ const AddStudent = () => {
       </div>
 
       <div className="students-list">
-        <h2>Registered Students</h2>
+        <h2>Registered GAS Students</h2>
         <div className="students-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Program</th>
-                <th>Batch</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.student_id}</td>
-                  <td>{`${student.user.first_name} ${student.user.last_name}`}</td>
-                  <td>{student.user.email}</td>
-                  <td>{student.program}</td>
-                  <td>{student.batch}</td>
-                  <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteStudent(student.id)}
-                      title="Delete Student"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
+          {students?.length === 0 ? (
+            <p style={{ textAlign: "center", padding: "1rem", color: "#606266", fontSize: "1rem" }}>
+              No registered students yet.
+            </p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Program</th>
+                  <th>Batch</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {students.map((student) => (
+                  <tr key={student.id}>
+                    <td>{student.student_id}</td>
+                    <td>{`${student.user.first_name} ${student.user.last_name}`}</td>
+                    <td>{student.user.email}</td>
+                    <td>{student.program}</td>
+                    <td>{student.batch}</td>
+                    <td>
+                      <button className="delete-btn" onClick={() => handleDeleteStudent(student.id)}>
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default AddStudent; 
+export default AddStudent;

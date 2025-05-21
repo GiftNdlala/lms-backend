@@ -28,6 +28,8 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import api from '../../services/api';
+
 
 const Assignments = () => {
   const [modules, setModules] = useState([]);
@@ -36,8 +38,28 @@ const Assignments = () => {
   const [assignmentTitle, setAssignmentTitle] = useState('');
   const [assignmentDescription, setAssignmentDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  
+  const fetchModules = async () => {
+  try {
+    setLoading(true);
+    setError('');
+    const response = await api.get('/modules/student/modules/');
+    setModules(Array.isArray(response.data) ? response.data : []);
+  } catch (err) {
+    setError('Failed to load modules. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
+useEffect(() => {
+  fetchModules();
+}, []);
+
+  /*useEffect(() => {
     fetchModules();
   }, []);
 
@@ -48,7 +70,7 @@ const Assignments = () => {
     } catch (error) {
       console.error('Error fetching modules:', error);
     }
-  };
+  };*/
 
   const handleCreateAssignment = async () => {
     try {

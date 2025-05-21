@@ -1,10 +1,11 @@
 .add-student-page {
   padding: 2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: grid; /* Ensures side-by-side layout */
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
   gap: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  /*max-width: 1400px;
+  margin: 0 auto;*/
+  align-items: stretch; /* Forces both sections to stretch equally */
 }
 
 .add-student-form {
@@ -12,6 +13,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 2rem;
+  align-self: start; /* Keeps it aligned at the top */
 }
 
 .add-student-form h1 {
@@ -26,6 +28,15 @@
   flex-direction: column;
   gap: 1.5rem;
 }
+
+.students-list, .add-student-form {
+  flex: 1; /* Ensures both sections take equal space */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Fills available space */
+  height: 100%; /* Makes them match */
+}
+
 
 .form-group {
   display: flex;
@@ -133,19 +144,20 @@ button.loading::after {
 
 /* Students List Styles */
 .students-list {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  display: flex;
+  flex-direction: column; /* Ensures title is on top */
+  justify-content: flex-start;
+  align-items: stretch;
+  background-color: #ffffff;
 }
-
 .students-list h2 {
   color: #2c3e50;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
 }
 
 .students-table {
+  width: 100%;
   overflow-x: auto;
 }
 
@@ -196,6 +208,7 @@ tr:hover {
 
 @media (max-width: 768px) {
   .add-student-page {
+    grid-template-columns: 1fr; /* Makes sections stack */
     padding: 1rem;
   }
 
@@ -205,9 +218,11 @@ tr:hover {
 
   table {
     font-size: 0.8rem;
+    width: 100%;
+    table-layout: auto; /* Ensures columns adjust dynamically */
   }
 
-  th, td {
-    padding: 0.75rem;
+  td, th {
+    white-space: nowrap; /* Prevents text from wrapping */
   }
 } 

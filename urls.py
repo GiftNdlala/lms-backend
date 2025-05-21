@@ -22,6 +22,7 @@ from django.views.generic import RedirectView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from djoser.views import UserViewSet
 from rest_framework.routers import DefaultRouter
+import modules.views
 
 # Create a router for user-related endpoints
 router = DefaultRouter()

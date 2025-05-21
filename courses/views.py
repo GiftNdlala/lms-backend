@@ -398,7 +398,7 @@ class ModuleViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
-
+    
     def get_queryset(self):
         if self.request.user.is_staff:
             return Module.objects.all()
