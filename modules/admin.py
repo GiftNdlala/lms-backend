@@ -1,10 +1,12 @@
 from django.contrib import admin
+from modules.models import Module
 from .models import (
     Module, ModuleContent, ModuleNotification, NotificationComment,
     StudentModuleProgress, ModuleAssignment, ModuleTest, Quiz,
     QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer, ModuleTemplate
 )
 
+admin.site.register(Module)
 @admin.register(ModuleTemplate)
 class ModuleTemplateAdmin(admin.ModelAdmin):
     list_display = ('code', 'name', 'is_active', 'created_at', 'updated_at')

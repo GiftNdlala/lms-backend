@@ -80,6 +80,29 @@ const GradeStudent = () => {
               { id: 3, name: 'Mike Brown', email: 'mike@example.com' },
               { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' }
             ]
+          },
+
+          {
+            id: 3,
+            title: 'Introduction to Databases',
+            code: 'DBMS0170',
+            description: 'Introduction to databases',
+            instructor: { name: 'Mr. Peter' },
+            students: [
+              { id: 5, name: 'Steve Mayer', email: 'steve@example.com' },
+              { id: 6, name: 'Jack Scott', email: 'jack@example.com' }
+            ]
+          },
+          {
+            id: 4,
+            title: 'Renewable Energy Systems',
+            code: 'CS301',
+            description: 'Learning the installation of renewable energy systems, their applications and long term benefits and functionality',
+            instructor: { name: 'Dr. Mandla' },
+            students: [
+              { id: 7, name: 'Dave Jack', email: 'dave@example.com' },
+              { id: 8, name: 'Walter Simons', email: 'walter@example.com' }
+            ]
           }
         ];
         setModules(dummyModules);
@@ -89,7 +112,9 @@ const GradeStudent = () => {
         // Add dummy stats
         const dummyStats = {
           1: { marked: 5, unmarked: 3, total: 8 },
-          2: { marked: 4, unmarked: 2, total: 6 }
+          2: { marked: 4, unmarked: 2, total: 6 },
+          3: { marked: 7, unmarked: 4, total: 11 },
+          4: { marked: 6, unmarked: 2, total: 8 },
         };
         setModuleStats(dummyStats);
       } finally {

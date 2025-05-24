@@ -67,15 +67,15 @@ const InstructorDashboard = () => {
   }
 
   return (
+    
     <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Welcome, {profile?.first_name} {profile?.last_name}</h1>
-        <div className="profile-info">
-          <p>Email: {profile?.email}</p>
-          <p>Department: {profile?.department}</p>
-        </div>
-      </div>
+      <div className="dashboard-header welcome-section">
+        <h1>Welcome, {profile.user.first_name} {profile.user.last_name}</h1>
+        <p>Email: {profile.user.email}</p>
+        <p>Department: {profile.department}</p>
+    </div>
       
+
       <div className="dashboard-content">
         <div className="dashboard-card">
           <h2>Quick Actions</h2>

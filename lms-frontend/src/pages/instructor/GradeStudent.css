@@ -1,6 +1,6 @@
 .grade-student {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -16,9 +16,9 @@
   margin-bottom: 30px;
 }
 
-.student-card {
+.module-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 15px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -136,4 +136,4 @@ button:disabled {
 .message.error {
   background: #ffebee;
   color: #c62828;
-} 
+}

@@ -3,9 +3,9 @@
   display: grid; /* Ensures side-by-side layout */
   grid-template-columns: 1fr 1fr; /* Two equal columns */
   gap: 2rem;
+  align-items: stretch; /* Forces both sections to stretch equally */
   /*max-width: 1400px;
   margin: 0 auto;*/
-  align-items: stretch; /* Forces both sections to stretch equally */
 }
 
 .add-student-form {
@@ -29,12 +29,13 @@
   gap: 1.5rem;
 }
 
-.students-list, .add-student-form {
+.add-student-form, .students-list{
   flex: 1; /* Ensures both sections take equal space */
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Fills available space */
   height: 100%; /* Makes them match */
+  min-height: 600px; /* Ensures they both stretch evenly */
 }
 
 
@@ -147,17 +148,23 @@ button.loading::after {
   display: flex;
   flex-direction: column; /* Ensures title is on top */
   justify-content: flex-start;
-  align-items: stretch;
+  padding-top: 2rem; /* Moves the table down */
+  align-items: stretch; /* Matches form width */
+  height: 100%;
+  flex-grow: 1; /* Allows it to expand inside .add-student-page */
   background-color: #ffffff;
 }
+
 .students-list h2 {
   color: #2c3e50;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem; /* Adds spacing before the table */
   font-size: 1.5rem;
+  text-align: center; /* Keeps alignment consistent */
 }
 
 .students-table {
   width: 100%;
+  flex-grow: 1; /* Makes sure table takes full space */
   overflow-x: auto;
 }
 
@@ -223,6 +230,7 @@ tr:hover {
   }
 
   td, th {
+    padding: 0.75rem;
     white-space: nowrap; /* Prevents text from wrapping */
   }
 } 
