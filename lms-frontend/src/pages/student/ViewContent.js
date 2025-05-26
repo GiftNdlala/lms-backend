@@ -4,7 +4,7 @@ import './StudentStyles.css';
 const mockModule = {
   title: 'New Venture Creation',
   code: 'NVC2025_1',
-  instructor: 'SIHLE MOYO',
+  instructor: 'TEVIN MEMLA',
   content: [
     {
       id: 1,
