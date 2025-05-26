@@ -85,7 +85,8 @@ class Instructor(models.Model):
     last_login_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name()} ({self.employee_id})"
+        return f"Instructor: {self.user.first_name} {self.user.last_name} | Email: {self.user.email} | Department: {self.department}"
+
 
     def get_active_courses(self):
         from courses.models import Course

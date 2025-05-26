@@ -4,6 +4,7 @@ import instructorApi from '../../services/instructorApi';
 import { FaTrash } from 'react-icons/fa';
 import './AddStudent.css';
 
+
 const AddStudent = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({

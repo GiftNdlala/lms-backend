@@ -57,6 +57,7 @@ const GradeStudent = () => {
         setModuleStats(stats);
       } catch (err) {
         setError('Failed to load modules. Please try again later.');
+
       } finally {
         setLoading(false);
       }

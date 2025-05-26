@@ -33,7 +33,7 @@ const StudentRewards = ({ moduleId }) => {
   const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/instructor/modules/${moduleId}/students/`);
+      const response = await axios.get(`/instructor/modules/${moduleId}/students/`);
       setStudents(response.data);
     } catch (err) {
       setError('Failed to load students');

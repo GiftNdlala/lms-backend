@@ -10,6 +10,7 @@ const api = axios.create({
   },
 });
 
+
 // Request interceptor for adding auth token
 api.interceptors.request.use(
   (config) => {
@@ -76,6 +77,16 @@ const handleApiError = (error) => {
     throw new Error('Error setting up request');
   }
 };
+
+// Fetches a list of students from the Django backend using a GET request.
+// The function returns a promise that resolves to the JSON response.
+// If the request fails, it logs an error to the console.
+/*export const fetchStudents = () => {
+    return fetch("http://localhost:8000/api/modules/instructor/modules/1/students/")
+        .then(response => response.json())
+        .catch(error => console.error("Error:", error));
+};*/
+
 
 // Module Management Functions
 export const getModules = async () => {
