@@ -15,8 +15,11 @@ const EditModule = () => {
     const fetchModule = async () => {
       try {
         const data = await instructorApi.getModuleDetails(moduleId);
-        setModuleData(data);
-        const studentsData = await instructorApi.getModuleStudents(moduleId);
+        const studentIds = Array.isArray(data.students)
+          ? data.students.map(s => (typeof s === 'object' ? s.id : s))
+          : [];
+        setModuleData({ ...data, students: studentIds });
+        const studentsData = await instructorApi.getStudents();
         setStudents(studentsData);
       } catch (error) {
         setError(error.message);
@@ -50,17 +53,10 @@ const EditModule = () => {
       <ModuleForm
         initialData={moduleData}
         onSubmit={handleSubmit}
-        submitButtonText="Update Module"
+        submitButtonText="Save Changes"
         isEditing={true}
+        students={students}
       />
-      <div>
-        <h3>Manage Students</h3>
-        <ul>
-          {students.map(student => (
-            <li key={student.id}>{student.name}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

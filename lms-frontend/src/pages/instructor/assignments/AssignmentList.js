@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import instructorApi from '../../../services/instructorApi';
 
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
@@ -47,8 +48,19 @@ const AssignmentList = () => {
     navigate('/dashboard/instructor/assignments/create');
   };
 
-  const handleViewAssignment = (id) => {
-    navigate(`/dashboard/instructor/assignments/${id}`);
+  const handleEditAssignment = (id) => {
+    navigate(`/dashboard/instructor/assignments/${id}/edit`);
+  };
+
+  const handleDeleteAssignment = async (id) => {
+    if (window.confirm('Are you sure you want to delete this assignment?')) {
+      try {
+        await instructorApi.deleteAssignment(id);
+        fetchAssignments();
+      } catch (error) {
+        alert('Failed to delete assignment.');
+      }
+    }
   };
 
   if (loading) {
@@ -99,9 +111,18 @@ const AssignmentList = () => {
                 <TableCell>
                   <Button
                     variant="outlined"
-                    onClick={() => handleViewAssignment(assignment.id)}
+                    color="primary"
+                    onClick={() => handleEditAssignment(assignment.id)}
+                    sx={{ mr: 1 }}
                   >
-                    View
+                    <span role="img" aria-label="edit">✏️</span>
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDeleteAssignment(assignment.id)}
+                  >
+                    <span role="img" aria-label="delete">🗑️</span>
                   </Button>
                 </TableCell>
               </TableRow>

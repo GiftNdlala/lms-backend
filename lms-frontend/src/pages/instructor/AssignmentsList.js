@@ -64,11 +64,6 @@ const AssignmentsList = () => {
               <p className="module-name">Module: {assignment.module_name}</p>
               <p className="due-date">Due: {new Date(assignment.due_date).toLocaleDateString()}</p>
               <p className="total-marks">Total Marks: {assignment.total_marks}</p>
-              <div className="assignment-status">
-                <span className={`status-badge ${assignment.status.toLowerCase()}`}>
-                  {assignment.status}
-                </span>
-              </div>
             </div>
           ))
         )}

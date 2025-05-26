@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import (
-    Module, ModuleContent, ModuleNotification, NotificationComment,
-    StudentModuleProgress, ModuleAssignment, ModuleTest, Quiz,
-    QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer, ModuleTemplate
+    ModuleTemplate, Module, ModuleContent, ModuleNotification,
+    NotificationComment, StudentModuleProgress, ModuleTest,
+    Quiz, QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer
 )
 
 @admin.register(ModuleTemplate)

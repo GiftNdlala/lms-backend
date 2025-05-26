@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AnnouncementSystem.css';
+import instructorApi from '../../services/instructorApi';
 
 const AnnouncementSystem = () => {
   // Mock data for courses - TODO: Replace with API call
-  const courses = [
-    { id: 1, title: 'Python 101' },
-    { id: 2, title: 'Web Development' },
-    { id: 3, title: 'Data Science' }
-  ];
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const data = await instructorApi.getModules();
+        setModules(data);
+      } catch (error) {
+        console.error('Error fetching modules:', error);
+      }
+    };
+    fetchModules();
+  }, []);
 
   // Mock data for announcements - TODO: Replace with API call
   const [announcements, setAnnouncements] = useState([
@@ -132,7 +141,7 @@ const AnnouncementSystem = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="courseId">Select Course</label>
+            <label htmlFor="courseId">Select Module</label>
             <select
               id="courseId"
               name="courseId"
@@ -140,10 +149,10 @@ const AnnouncementSystem = () => {
               onChange={handleChange}
               required
             >
-              <option value="">Select a course</option>
-              {courses.map(course => (
-                <option key={course.id} value={course.id}>
-                  {course.title}
+              <option value="">Select a module</option>
+              {modules.map(module => (
+                <option key={module.id} value={module.id}>
+                  {module.title}
                 </option>
               ))}
             </select>
@@ -192,7 +201,7 @@ const AnnouncementSystem = () => {
             
             <div className="announcement-meta">
               <span className="course">
-                {courses.find(c => c.id === announcement.courseId)?.title}
+                {modules.find(m => m.id === Number(announcement.courseId))?.title}
               </span>
               <span className="date">{announcement.date}</span>
             </div>

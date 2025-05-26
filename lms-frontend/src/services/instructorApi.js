@@ -152,6 +152,11 @@ const instructorApi = {
     }
   },
 
+  getModuleContent: async (moduleId) => {
+    const response = await api.get(`/modules/instructor/modules/${moduleId}/contents/`);
+    return response.data;
+  },
+
   // Quiz Management
   getModuleQuizzes: async (moduleId) => {
     return quizzes.getModuleQuizzes(moduleId);
@@ -221,6 +226,16 @@ const instructorApi = {
       return response.data;
     } catch (error) {
       console.error('Error deleting module template:', error);
+      throw error;
+    }
+  },
+
+  deleteAssignment: async (assignmentId) => {
+    try {
+      const response = await api.delete(`/assignments/${assignmentId}/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
       throw error;
     }
   },

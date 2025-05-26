@@ -10,6 +10,7 @@ api_patterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('accounts/', include('accounts.urls')),
     path('modules/', include('modules.urls')),
+    path('assignments/', include('assignments.urls')),
 ]
 
 urlpatterns = [

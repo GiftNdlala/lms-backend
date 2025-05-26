@@ -14,12 +14,12 @@ from djoser.views import UserViewSet
 from accounts.models import Student
 from .models import (
     Module, ModuleContent, StudentModuleProgress, ModuleNotification,
-    NotificationComment, ModuleAssignment, ModuleTest, Quiz, QuizQuestion, QuizChoice, QuizAttempt, QuizAnswer, AssignmentSubmission
+    NotificationComment, ModuleTest, Quiz, QuizQuestion, QuizChoice, QuizAttempt
 )
 from .serializers import (
     ModuleSerializer, ModuleContentSerializer, ModuleStudentManagementSerializer,
     StudentSerializer, ModuleNotificationSerializer, NotificationCommentSerializer,
-    ModuleAssignmentSerializer, ModuleTestSerializer, AssignmentSubmissionSerializer
+    ModuleTestSerializer
 )
 import mimetypes
 from django.contrib.auth.decorators import login_required
@@ -33,12 +33,9 @@ class ModuleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
     def get_queryset(self):
-        user = self.request.user
-        if hasattr(user, 'instructor'):
-            return Module.objects.filter(instructor=user.instructor)
-        elif hasattr(user, 'student'):
-            return Module.objects.filter(students=user.student)
-        return Module.objects.all() # Debugging Step
+        if hasattr(self.request.user, 'instructor'):
+            return Module.objects.filter(instructor=self.request.user.instructor)
+        return Module.objects.none()
 
     def create(self, request, *args, **kwargs):
         if not hasattr(request.user, 'instructor'):
@@ -87,13 +84,6 @@ class ModuleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=['get'])
-    def students(self, request, pk=None):
-        module = self.get_object()
-        students = module.students.all()
-        serializer = StudentSerializer(students, many=True)
-        return Response(serializer.data)
-
     @action(detail=True, methods=['get', 'post', 'delete'],
             serializer_class=ModuleContentSerializer,
             parser_classes=[MultiPartParser, FormParser])
@@ -108,13 +98,6 @@ class ModuleViewSet(viewsets.ModelViewSet):
         module = self.get_object()
         notifications = module.notifications.all()
         serializer = ModuleNotificationSerializer(notifications, many=True)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=['get'])
-    def assignments(self, request, pk=None):
-        module = self.get_object()
-        assignments = module.assignments.all()
-        serializer = ModuleAssignmentSerializer(assignments, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
@@ -145,6 +128,17 @@ class ModuleViewSet(viewsets.ModelViewSet):
             'completed_contents': completed_contents,
             'progress_percentage': round(progress_percentage, 2)
         })
+
+    @action(detail=True, methods=['get'])
+    def assignments(self, request, pk=None):
+        module = self.get_object()
+        # Only allow instructors who own the module
+        if not hasattr(request.user, 'instructor') or module.instructor != request.user.instructor:
+            return Response({"detail": "Only the module's instructor can view assignments."}, status=403)
+        assignments = module.assignments.all()
+        from assignments.serializers import AssignmentSerializer
+        serializer = AssignmentSerializer(assignments, many=True)
+        return Response(serializer.data)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
@@ -206,16 +200,6 @@ class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': 'Notification not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    @action(detail=True, methods=['get'])
-    def assignments(self, request, pk=None):
-        module = self.get_object()
-        if not module.students.filter(id=request.user.student.id).exists():
-            raise PermissionDenied("You are not enrolled in this module")
-        
-        assignments = module.assignments.all()
-        serializer = ModuleAssignmentSerializer(assignments, many=True)
-        return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
     def tests(self, request, pk=None):
@@ -286,24 +270,6 @@ class StudentModuleViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': 'Content not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    @action(detail=True, methods=['post'], url_path='assignments/(?P<assignment_id>[^/.]+)/submit', parser_classes=[MultiPartParser, FormParser])
-    def submit_assignment(self, request, pk=None, assignment_id=None):
-        module = self.get_object()
-        if not module.students.filter(id=request.user.student.id).exists():
-            raise PermissionDenied("You are not enrolled in this module")
-        try:
-            assignment = module.assignments.get(id=assignment_id)
-        except ModuleAssignment.DoesNotExist:
-            return Response({'error': 'Assignment not found'}, status=status.HTTP_404_NOT_FOUND)
-        # Check if already submitted
-        if AssignmentSubmission.objects.filter(assignment=assignment, student=request.user.student).exists():
-            return Response({'error': 'You have already submitted this assignment'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = AssignmentSubmissionSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(student=request.user.student, assignment=assignment)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

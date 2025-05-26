@@ -34,7 +34,7 @@ const CreateAssignment = () => {
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/modules/', {
+        const response = await axios.get('http://localhost:8000/api/modules/instructor/modules/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }

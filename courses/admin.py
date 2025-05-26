@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Course, Module, Lesson, Assignment, AssignmentSubmission,
+    Course, Module, Lesson,
     Announcement, Discussion, Comment, Enrollment, CourseProgress,
     Assessment, Question, AssessmentAssignment, StudentAnswer, AssessmentGrade,
     EWallet, Transaction, WithdrawalRequest
@@ -23,18 +23,6 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'order')
     list_filter = ('module',)
     search_fields = ('title', 'content')
-
-@admin.register(Assignment)
-class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module', 'due_date', 'points')
-    list_filter = ('module', 'due_date')
-    search_fields = ('title', 'description')
-
-@admin.register(AssignmentSubmission)
-class AssignmentSubmissionAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'student', 'submitted_at', 'grade', 'graded_at')
-    list_filter = ('assignment__module', 'student', 'submitted_at')
-    search_fields = ('content', 'feedback')
 
 @admin.register(Enrollment)
 class EnrollmentAdmin(admin.ModelAdmin):

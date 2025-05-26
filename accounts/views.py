@@ -26,6 +26,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.exceptions import TokenError
+from courses.models import Module
 #from .serializers import ModuleSerializer
 
 
@@ -198,7 +199,7 @@ class InstructorViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        from modules.models import Module
+        from courses.models import Module
         modules = Module.objects.filter(instructor=request.user.instructor)
         from modules.serializers import ModuleSerializer
         serializer = ModuleSerializer(modules, many=True)
@@ -248,6 +249,7 @@ class InstructorViewSet(viewsets.ModelViewSet):
 
         from .services import register_student
         try:
+            # Document: password is optional in request.data
             student = register_student(request.data)
             serializer = StudentSerializer(student)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

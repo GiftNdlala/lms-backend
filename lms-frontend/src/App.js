@@ -37,6 +37,7 @@ import StudentList from './pages/instructor/StudentList';
 import InstructorEwallet from './pages/instructor/InstructorEwallet';
 import ViewContent from './pages/student/ViewContent';
 import EditModule from './pages/instructor/EditModule';
+import ModuleContent from './pages/instructor/ModuleContent';
 
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
           <Route path="modules" element={<ModulesList />} />
           <Route path="modules/create" element={<AddModule />} />
           <Route path="modules/:moduleId/edit" element={<EditModule />} />
+          <Route path="modules/:moduleId/content" element={<ModuleContent />} />
           <Route path="modules/:moduleId/quiz" element={<QuizAssessment />} />
           
           {/* Assignment routes */}

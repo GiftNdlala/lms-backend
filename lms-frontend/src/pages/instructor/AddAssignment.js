@@ -23,7 +23,7 @@ const AddAssignment = () => {
     title: '',
     description: '',
     dueDate: '',
-    moduleId: '',
+    module: '',
     totalMarks: '',
   });
 

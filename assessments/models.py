@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from modules.models import Module
+from courses.models import Module
 
 class Assessment(models.Model):
     ASSESSMENT_TYPES = (

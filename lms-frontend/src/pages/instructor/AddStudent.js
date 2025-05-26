@@ -12,13 +12,15 @@ const AddStudent = () => {
     last_name: '',
     student_id: '',
     program: '',
-    batch: ''
+    batch: '',
+    password: ''
   });
 
   const [students, setStudents] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [showedPassword, setShowedPassword] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -106,6 +108,10 @@ const AddStudent = () => {
       newErrors.batch = 'Please enter a valid year';
     }
 
+    if (!formData.password || formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -140,6 +146,7 @@ const AddStudent = () => {
 
     try {
       await instructorApi.addStudent(formData);
+      setShowedPassword(formData.password);
       setMessage({
         type: 'success',
         text: `Student ${formData.first_name} ${formData.last_name} has been successfully added!`
@@ -150,7 +157,8 @@ const AddStudent = () => {
         last_name: '',
         student_id: '',
         program: '',
-        batch: ''
+        batch: '',
+        password: ''
       });
       fetchStudents();
     } catch (error) {
@@ -171,6 +179,16 @@ const AddStudent = () => {
         {message.text && (
           <div className={`message ${message.type}`}>
             {message.text}
+          </div>
+        )}
+
+        {showedPassword && message.type === 'success' && (
+          <div className="message success" style={{ marginBottom: '1rem' }}>
+            <strong>Initial Password:</strong> <span style={{ fontFamily: 'monospace' }}>{showedPassword}</span>
+            <br />
+            <span style={{ fontSize: '0.9em', color: '#666' }}>
+              Please copy and send this password to the student. It will not be shown again.
+            </span>
           </div>
         )}
 
@@ -267,6 +285,21 @@ const AddStudent = () => {
               className={errors.batch ? 'error' : ''}
             />
             {errors.batch && <span className="error-text">{errors.batch}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Set initial password for student"
+              className={errors.password ? 'error' : ''}
+            />
+            {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
           <button type="submit" disabled={loading} className={loading ? 'loading' : ''}>

@@ -3,16 +3,25 @@ from accounts.models import User, Student, Instructor
 from django.utils import timezone
 from decimal import Decimal
 
+
+
 class Module(models.Model):
-    title = models.CharField(max_length=200)
     code = models.CharField(max_length=20, unique=True, help_text="Unique module code (e.g., MOD101)", null=True, blank=True)
+    title = models.CharField(max_length=200)
     description = models.TextField()
+    duration = models.DurationField(help_text="Duration of the module (e.g., 2 hours, 30 minutes)", null=True, blank=True)
     credits = models.PositiveIntegerField(default=0, help_text="Number of credits for this module", null=True, blank=True)
     instructor = models.ForeignKey(Instructor, on_delete=models.SET_NULL, related_name='created_modules', null=True, blank=True)
-    students = models.ManyToManyField(Student, through='ModuleEnrollment', related_name='course_module_enrollments')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='modules', null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
+    students = models.ManyToManyField(Student, through='ModuleEnrollment', related_name='course_module_enrollments')
+
+    class Meta:
+        ordering = ['order']
+        unique_together = ['course', 'order']
 
     def __str__(self):
         return f"{self.code} - {self.title}" if self.code else self.title
@@ -45,34 +54,6 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.module.title} - {self.title}"
-
-class Assignment(models.Model):
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='assignments')
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    due_date = models.DateTimeField()
-    points = models.IntegerField(default=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.module.title} - {self.title}"
-
-class AssignmentSubmission(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    content = models.TextField()
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    grade = models.IntegerField(null=True, blank=True)
-    feedback = models.TextField(blank=True)
-    graded_at = models.DateTimeField(null=True, blank=True)
-    graded_by = models.ForeignKey(Instructor, on_delete=models.SET_NULL, null=True, blank=True)
-
-    class Meta:
-        unique_together = ['assignment', 'student']
-
-    def __str__(self):
-        return f"{self.student.user.get_full_name()} - {self.assignment.title}"
 
 class StudentProgress(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -152,7 +133,7 @@ class Enrollment(models.Model):
 class CourseProgress(models.Model):
     enrollment = models.OneToOneField(Enrollment, on_delete=models.CASCADE, related_name='progress')
     completed_modules = models.ManyToManyField('Module', blank=True, related_name='completed_by')
-    completed_assignments = models.ManyToManyField('Assignment', blank=True, related_name='completed_by')
+    completed_assignments = models.ManyToManyField('assignments.Assignment', blank=True, related_name='completed_by')
     current_module = models.ForeignKey('Module', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_for')
     last_activity = models.DateTimeField(auto_now=True)
     total_time_spent = models.DurationField(default=timezone.timedelta())

@@ -16,7 +16,7 @@ const StudentModules = () => {
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        const response = await api.get('/student/modules');
+        const response = await api.get('/student/modules/');
         setModules(response.data.modules);
         
         // Calculate stats
@@ -70,25 +70,7 @@ const StudentModules = () => {
       </div>
 
       <div className="modules-grid">
-        {/* Dummy module card for New Venture Creation */}
-        <div className="module-card" onClick={() => navigate('/dashboard/student/modules/new-venture-creation')} style={{ cursor: 'pointer', border: '2px solid #6c63ff' }}>
-          <div className="module-card-header">
-            <span className="module-code">NVC2025_1</span>
-          </div>
-          <div>
-            <h2>New Venture Creation</h2>
-            <p className="instructor">
-              <span role="img" aria-label="instructor">👤</span> SIHLE MOYO
-            </p>
-          </div>
-          <div className="module-progress">
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `0%` }} />
-            </div>
-            <span className="progress-text">0% Complete</span>
-          </div>
-        </div>
-        {/* Render other modules as before */}
+        {/* Removed dummy module card for New Venture Creation */}
         {modules.map((module) => (
           <div key={module._id} className="module-card" onClick={() => navigate(`/dashboard/student/modules/${module._id}`)} style={{ cursor: 'pointer' }}>
             <div className="module-card-header">

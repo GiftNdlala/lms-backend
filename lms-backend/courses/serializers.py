@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Module, ModuleEnrollment, Lesson, Assignment
+from .models import Module, ModuleEnrollment, Lesson
+from assignments.models import Assignment
 
 class ModuleSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)

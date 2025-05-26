@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
+from assignments.models import Assignment, AssignmentSubmission
 from .models import (
-    Course, Module, Lesson, Assignment, AssignmentSubmission,
+    Course, Module, Lesson,
     StudentProgress, CourseEnrollment,
     EWallet, Transaction, WithdrawalRequest,
     Assessment, Question, AssessmentAssignment,

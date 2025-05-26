@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'courses.apps.CoursesConfig',
     'modules.apps.ModulesConfig',
+    'assignments',
+    
 ]
 
 MIDDLEWARE = [

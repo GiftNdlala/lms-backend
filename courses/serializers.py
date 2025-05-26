@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from assignments.models import Assignment, AssignmentSubmission
 from .models import (
-    Course, Module, Lesson, Assignment, AssignmentSubmission,
+    Course, Module, Lesson,
     StudentProgress, CourseEnrollment,
     EWallet, Transaction, WithdrawalRequest,
     Assessment, Question, AssessmentAssignment,

@@ -5,7 +5,7 @@ from .models import User, Student
 
 def register_student(student_data):
     """
-    Register a new student with default password
+    Register a new student with a provided or default password
     """
     # Create user first
     user = User.objects.create(
@@ -24,13 +24,19 @@ def register_student(student_data):
         program=student_data.get('program')
     )
     
-    # Generate and set default password
-    default_password = student.generate_default_password()
-    user.set_password(default_password)
+    # Use provided password or generate default
+    password = student_data.get('password')
+    if password:
+        user.set_password(password)
+        user.must_change_password = True
+    else:
+        password = student.generate_default_password()
+        user.set_password(password)
+        user.must_change_password = False
     user.save()
     
     # Send welcome email with credentials
-    send_welcome_email(student, default_password)
+    # send_welcome_email(student, password)
     
     return student
 

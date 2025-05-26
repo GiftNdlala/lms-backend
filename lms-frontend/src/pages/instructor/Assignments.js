@@ -32,7 +32,7 @@ import api from '../../services/api';
 
 
 const Assignments = () => {
-  const [modules, setModules] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedModule, setSelectedModule] = useState('');
   const [assignmentTitle, setAssignmentTitle] = useState('');
@@ -42,22 +42,22 @@ const Assignments = () => {
   const [error, setError] = useState('');
   
   
-  const fetchModules = async () => {
-  try {
-    setLoading(true);
-    setError('');
-    const response = await api.get('/modules/student/modules/');
-    setModules(Array.isArray(response.data) ? response.data : []);
-  } catch (err) {
-    setError('Failed to load modules. Please try again later.');
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchAssignments = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await api.get('/assignments/');
+      setAssignments(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+      setError('Failed to load assignments. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-useEffect(() => {
-  fetchModules();
-}, []);
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
   /*useEffect(() => {
     fetchModules();
@@ -82,7 +82,7 @@ useEffect(() => {
       console.log('Assignment created:', response.data);
       setOpenDialog(false);
       // Refresh modules to show new assignment
-      fetchModules();
+      fetchAssignments();
     } catch (error) {
       console.error('Error creating assignment:', error);
     }
@@ -115,22 +115,20 @@ useEffect(() => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {modules.map((module) => (
-                module.assignments?.map((assignment) => (
-                  <TableRow key={assignment.id}>
-                    <TableCell>{module.title}</TableCell>
-                    <TableCell>{assignment.title}</TableCell>
-                    <TableCell>{new Date(assignment.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="error">
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+              {assignments.map((assignment) => (
+                <TableRow key={assignment.id}>
+                  <TableCell>{assignment.module_title || assignment.module?.title}</TableCell>
+                  <TableCell>{assignment.title}</TableCell>
+                  <TableCell>{new Date(assignment.due_date).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <IconButton color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
@@ -147,11 +145,7 @@ useEffect(() => {
               onChange={(e) => setSelectedModule(e.target.value)}
               label="Module"
             >
-              {modules.map((module) => (
-                <MenuItem key={module.id} value={module.id}>
-                  {module.title}
-                </MenuItem>
-              ))}
+              {/* Add module options here */}
             </Select>
           </FormControl>
           <TextField
