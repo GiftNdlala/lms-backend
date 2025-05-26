@@ -31,9 +31,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-developme
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# Set allowed hosts from environment variable or default to localhost
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
@@ -244,7 +241,7 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = Falseohky help me 
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 

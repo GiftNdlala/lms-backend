@@ -16,7 +16,7 @@ const StudentModules = () => {
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        const response = await api.get('/student/modules/');
+        const response = await api.get('/api/student/modules/');
         setModules(response.data.modules);
         
         // Calculate stats
