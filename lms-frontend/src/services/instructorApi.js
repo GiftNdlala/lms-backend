@@ -5,7 +5,7 @@ const instructorApi = {
   // Profile
   getProfile: async () => {
     try {
-      const response = await api.get('/accounts/instructors/profile/');
+      const response = await api.get('/api/accounts/instructors/profile/');
       return response.data;
     } catch (error) {
       console.error('Error fetching instructor profile:', error);
@@ -15,7 +15,7 @@ const instructorApi = {
 
   updateProfile: async (profileData) => {
     try {
-      const response = await api.patch('/accounts/instructors/profile/', profileData);
+      const response = await api.patch('/api/accounts/instructors/profile/', profileData);
       return response.data;
     } catch (error) {
       console.error('Error updating instructor profile:', error);
@@ -26,7 +26,7 @@ const instructorApi = {
   // Students
   getStudents: async () => {
     try {
-      const response = await api.get('/accounts/instructors/students/');
+      const response = await api.get('/api/accounts/instructors/students/');
       return response.data;
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -36,7 +36,7 @@ const instructorApi = {
 
   addStudent: async (studentData) => {
     try {
-      const response = await api.post('/accounts/instructors/add_student/', studentData);
+      const response = await api.post('/api/accounts/instructors/add_student/', studentData);
       return response.data;
     } catch (error) {
       console.error('Error adding student:', error);
@@ -46,7 +46,7 @@ const instructorApi = {
 
   deleteStudent: async (studentId) => {
     try {
-      const response = await api.delete(`/accounts/instructors/students/${studentId}/`);
+      const response = await api.delete(`/api/accounts/instructors/students/${studentId}/`);
       return response.data;
     } catch (error) {
       console.error('Error deleting student:', error);
@@ -57,7 +57,7 @@ const instructorApi = {
   // Modules
   getModules: async () => {
     try {
-      const response = await api.get('/modules/instructor/modules/');
+      const response = await api.get('/api/modules/instructor/modules/');
       return response.data;
     } catch (error) {
       console.error('Error fetching modules:', error);
@@ -67,7 +67,7 @@ const instructorApi = {
 
   getModuleDetails: async (moduleId) => {
     try {
-      const response = await api.get(`/modules/instructor/modules/${moduleId}/`);
+      const response = await api.get(`/api/modules/instructor/modules/${moduleId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching module details:', error);
@@ -77,7 +77,7 @@ const instructorApi = {
 
   getModuleStudents: async (moduleId) => {
     try {
-      const response = await api.get(`/modules/instructor/modules/${moduleId}/students/`);
+      const response = await api.get(`/api/modules/instructor/modules/${moduleId}/students/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching module students:', error);
@@ -87,7 +87,7 @@ const instructorApi = {
 
   updateModuleStudents: async (moduleId, studentIds) => {
     try {
-      const response = await api.put(`/modules/instructor/modules/${moduleId}/students/`, {
+      const response = await api.put(`/api/modules/instructor/modules/${moduleId}/students/`, {
         student_ids: studentIds
       });
       return response.data;
@@ -99,7 +99,7 @@ const instructorApi = {
 
   createModule: async (moduleData) => {
     try {
-      const response = await api.post('/modules/instructor/modules/', moduleData);
+      const response = await api.post('/api/modules/instructor/modules/', moduleData);
       return response.data;
     } catch (error) {
       console.error('Error creating module:', error);
@@ -109,7 +109,7 @@ const instructorApi = {
 
   updateModule: async (moduleId, moduleData) => {
     try {
-      const response = await api.patch(`/modules/instructor/modules/${moduleId}/`, moduleData);
+      const response = await api.patch(`/api/modules/instructor/modules/${moduleId}/`, moduleData);
       return response.data;
     } catch (error) {
       console.error('Error updating module:', error);
@@ -119,7 +119,7 @@ const instructorApi = {
 
   deleteModule: async (moduleId) => {
     try {
-      const response = await api.delete(`/modules/instructor/modules/${moduleId}/`);
+      const response = await api.delete(`/api/modules/instructor/modules/${moduleId}/`);
       return response.data;
     } catch (error) {
       console.error('Error deleting module:', error);
@@ -130,7 +130,7 @@ const instructorApi = {
   // Module Content
   uploadContent: async (moduleId, formData) => {
     try {
-      const response = await api.post(`/modules/instructor/modules/${moduleId}/contents/`, formData, {
+      const response = await api.post(`/api/modules/instructor/modules/${moduleId}/contents/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -144,7 +144,7 @@ const instructorApi = {
 
   deleteContent: async (moduleId, contentId) => {
     try {
-      const response = await api.delete(`/modules/instructor/modules/${moduleId}/contents/${contentId}/`);
+      const response = await api.delete(`/api/modules/instructor/modules/${moduleId}/contents/${contentId}/`);
       return response.data;
     } catch (error) {
       console.error('Error deleting content:', error);
@@ -153,7 +153,7 @@ const instructorApi = {
   },
 
   getModuleContent: async (moduleId) => {
-    const response = await api.get(`/modules/instructor/modules/${moduleId}/contents/`);
+    const response = await api.get(`/api/modules/instructor/modules/${moduleId}/contents/`);
     return response.data;
   },
 
@@ -171,7 +171,13 @@ const instructorApi = {
   },
 
   publishQuiz: async (quizId) => {
-    return quizzes.publishQuiz(quizId);
+    try {
+      const response = await api.post(`/api/modules/quizzes/${quizId}/publish/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error publishing quiz:', error);
+      throw error;
+    }
   },
 
   getQuizQuestions: async (quizId) => {
@@ -181,7 +187,7 @@ const instructorApi = {
   // Assigned Modules
   getAssignedModules: async () => {
     try {
-      const response = await api.get('/accounts/instructors/assigned_modules/');
+      const response = await api.get('/api/accounts/instructors/assigned_modules/');
       return response.data;
     } catch (error) {
       console.error('Error fetching assigned modules:', error);
@@ -192,7 +198,7 @@ const instructorApi = {
   // Module Templates
   getModuleTemplates: async () => {
     try {
-      const response = await api.get('/modules/templates/');
+      const response = await api.get('/api/modules/templates/');
       return response.data;
     } catch (error) {
       console.error('Error fetching module templates:', error);
@@ -202,7 +208,7 @@ const instructorApi = {
 
   createModuleTemplate: async (templateData) => {
     try {
-      const response = await api.post('/modules/templates/', templateData);
+      const response = await api.post('/api/modules/templates/', templateData);
       return response.data;
     } catch (error) {
       console.error('Error creating module template:', error);
@@ -212,7 +218,7 @@ const instructorApi = {
 
   updateModuleTemplate: async (templateId, templateData) => {
     try {
-      const response = await api.patch(`/modules/templates/${templateId}/`, templateData);
+      const response = await api.patch(`/api/modules/templates/${templateId}/`, templateData);
       return response.data;
     } catch (error) {
       console.error('Error updating module template:', error);
@@ -222,7 +228,7 @@ const instructorApi = {
 
   deleteModuleTemplate: async (templateId) => {
     try {
-      const response = await api.delete(`/modules/templates/${templateId}/`);
+      const response = await api.delete(`/api/modules/templates/${templateId}/`);
       return response.data;
     } catch (error) {
       console.error('Error deleting module template:', error);
@@ -232,10 +238,163 @@ const instructorApi = {
 
   deleteAssignment: async (assignmentId) => {
     try {
-      const response = await api.delete(`/assignments/${assignmentId}/`);
+      const response = await api.delete(`/api/assignments/${assignmentId}/`);
       return response.data;
     } catch (error) {
       console.error('Error deleting assignment:', error);
+      throw error;
+    }
+  },
+
+  // Announcements
+  getAnnouncements: async () => {
+    try {
+      const response = await api.get('/api/announcements/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      throw error;
+    }
+  },
+
+  createAnnouncement: async (announcementData) => {
+    try {
+      const response = await api.post('/api/announcements/', announcementData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating announcement:', error);
+      throw error;
+    }
+  },
+
+  updateAnnouncement: async (announcementId, announcementData) => {
+    try {
+      const response = await api.patch(`/api/announcements/${announcementId}/`, announcementData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating announcement:', error);
+      throw error;
+    }
+  },
+
+  deleteAnnouncement: async (announcementId) => {
+    try {
+      const response = await api.delete(`/api/announcements/${announcementId}/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting announcement:', error);
+      throw error;
+    }
+  },
+
+  // Module Notifications
+  getModuleNotifications: async (moduleId) => {
+    const response = await api.get(`/api/modules/instructor/modules/${moduleId}/notifications/`);
+    return response.data;
+  },
+
+  createModuleNotification: async (moduleId, data) => {
+    const response = await api.post(`/api/modules/instructor/modules/${moduleId}/notifications/`, data);
+    return response.data;
+  },
+
+  updateModuleNotification: async (moduleId, notificationId, data) => {
+    const response = await api.put(`/api/modules/instructor/modules/${moduleId}/notifications/${notificationId}/`, data);
+    return response.data;
+  },
+
+  deleteModuleNotification: async (moduleId, notificationId) => {
+    const response = await api.delete(`/api/modules/instructor/modules/${moduleId}/notifications/${notificationId}/`);
+    return response.data;
+  },
+
+  // Section/Unit Management
+  getSections: async (moduleId) => {
+    const response = await api.get(`/api/modules/instructor/sections/?module=${moduleId}`);
+    return response.data;
+  },
+
+  createSection: async (data) => {
+    const response = await api.post('/api/modules/instructor/sections/', data);
+    return response.data;
+  },
+
+  updateSection: async (sectionId, data) => {
+    const response = await api.put(`/api/modules/instructor/sections/${sectionId}/`, data);
+    return response.data;
+  },
+
+  deleteSection: async (sectionId) => {
+    const response = await api.delete(`/api/modules/instructor/sections/${sectionId}/`);
+    return response.data;
+  },
+
+  // Section Content Management
+  getSectionContents: async (sectionId) => {
+    const response = await api.get(`/api/modules/instructor/section-contents/?section=${sectionId}`);
+    return response.data;
+  },
+
+  createSectionContent: async (data) => {
+    const response = await api.post('/api/modules/instructor/section-contents/', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  updateSectionContent: async (contentId, data) => {
+    const response = await api.put(`/api/modules/instructor/section-contents/${contentId}/`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  deleteSectionContent: async (contentId) => {
+    const response = await api.delete(`/api/modules/instructor/section-contents/${contentId}/`);
+    return response.data;
+  },
+
+  // Assignment methods
+  createAssignment: async (data) => {
+    const response = await api.post('/api/modules/assignments/', data);
+    return response.data;
+  },
+
+  getAssignments: async () => {
+    const response = await api.get('/api/modules/assignments/');
+    return response.data;
+  },
+
+  getAssignment: async (id) => {
+    const response = await api.get(`/api/modules/assignments/${id}/`);
+    return response.data;
+  },
+
+  updateAssignment: async (id, data) => {
+    const response = await api.patch(`/api/modules/assignments/${id}/`, data);
+    return response.data;
+  },
+
+  gradeAssignment: async (id, data) => {
+    const response = await api.post(`/api/modules/assignments/${id}/grade/`, data);
+    return response.data;
+  },
+
+  getAllQuizzes: async () => {
+    try {
+      const response = await api.get('/api/modules/instructor/quizzes/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all quizzes:', error);
+      throw error;
+    }
+  },
+
+  deleteQuiz: async (quizId) => {
+    try {
+      await api.delete(`/api/modules/quizzes/${quizId}/`);
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
       throw error;
     }
   },

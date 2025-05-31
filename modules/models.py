@@ -96,6 +96,8 @@ class Quiz(models.Model):
     description = models.TextField()
     time_limit = models.DurationField(help_text="Time limit for the quiz")
     total_points = models.PositiveIntegerField(default=0)
+    passing_score = models.PositiveIntegerField(default=60, help_text="Passing score as a percentage")
+    reward_points = models.PositiveIntegerField(default=0, help_text="Points awarded to student's e-wallet upon passing")
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -105,6 +107,29 @@ class Quiz(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def award_achievement(self, student, score_percentage):
+        """Award achievement and points based on quiz performance, but only for 100%"""
+        from accounts.models import Achievement, EWallet
+        
+        if score_percentage == 100:
+            title = "Outstanding Achievement"
+            description = f"Outstanding Achievement Bonus for '{self.title}', '{self.module.title}' Task"
+            points = self.reward_points * 2 if self.reward_points else 10  # fallback to 10 if not set
+            # Create achievement
+            achievement = Achievement.objects.create(
+                student=student,
+                type='quiz',
+                title=title,
+                description=description,
+                points=points,
+                related_quiz=self
+            )
+            # Add funds with custom reason
+            ewallet, _ = EWallet.objects.get_or_create(student=student)
+            ewallet.add_funds(points, description)
+            return achievement
+        return None
 
 class QuizQuestion(models.Model):
     QUESTION_TYPES = [
@@ -156,3 +181,33 @@ class QuizAnswer(models.Model):
 
     def __str__(self):
         return f"Answer for {self.question.question_text[:50]}"
+
+class ModuleSection(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.module.title} - {self.title}"
+
+class SectionContent(models.Model):
+    section = models.ForeignKey(ModuleSection, on_delete=models.CASCADE, related_name='contents')
+    title = models.CharField(max_length=200)
+    file = models.FileField(upload_to='section_contents/', blank=True, null=True)
+    file_type = models.CharField(max_length=50, blank=True)
+    text_content = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.section.title} - {self.title}"

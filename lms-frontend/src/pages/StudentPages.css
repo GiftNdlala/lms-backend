@@ -26,6 +26,49 @@
   overflow: hidden;
 }
 
+.grades-filter {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f8f9fa;
+}
+
+.filter-btn.active {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+
+.type-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.type-badge.quiz {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.type-badge.assignment {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
 .grades-table {
   width: 100%;
   border-collapse: collapse;

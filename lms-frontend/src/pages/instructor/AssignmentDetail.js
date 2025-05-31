@@ -16,37 +16,27 @@ const AssignmentDetail = () => {
     totalMarks: '',
   });
 
-  const fetchAssignmentDetails = useCallback(async () => {
+  const fetchAssignmentDetails = async () => {
     try {
-      const response = await fetch(`/api/assignments/${assignmentId}/`, {
+      const response = await fetch(`/api/modules/assignments/${assignmentId}/`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAssignment(data);
-        setFormData({
-          title: data.title,
-          description: data.description,
-          dueDate: data.due_date,
-          totalMarks: data.total_marks,
-        });
-      } else {
-        setError('Failed to fetch assignment details');
+      if (!response.ok) {
+        throw new Error('Failed to fetch assignment details');
       }
+      const data = await response.json();
+      setAssignment(data);
     } catch (error) {
-      setError('Error fetching assignment details');
       console.error('Error:', error);
-    } finally {
-      setLoading(false);
+      setError('Error fetching assignment details');
     }
-  }, [assignmentId]);
+  };
 
   useEffect(() => {
     fetchAssignmentDetails();
-  }, [fetchAssignmentDetails]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,49 +46,42 @@ const AssignmentDetail = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleUpdate = async (updatedData) => {
     try {
-      const response = await fetch(`/api/assignments/${assignmentId}/`, {
-        method: 'PUT',
+      const response = await fetch(`/api/modules/assignments/${assignmentId}/`, {
+        method: 'PATCH',
         headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(updatedData),
       });
-
-      if (response.ok) {
-        setIsEditing(false);
-        fetchAssignmentDetails();
-      } else {
-        setError('Failed to update assignment');
+      if (!response.ok) {
+        throw new Error('Failed to update assignment');
       }
+      const data = await response.json();
+      setAssignment(data);
     } catch (error) {
-      setError('Error updating assignment');
       console.error('Error:', error);
+      setError('Error updating assignment');
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this assignment?')) {
-      try {
-        const response = await fetch(`/api/assignments/${assignmentId}/`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
-
-        if (response.ok) {
-          navigate('/dashboard/instructor/assignments');
-        } else {
-          setError('Failed to delete assignment');
-        }
-      } catch (error) {
-        setError('Error deleting assignment');
-        console.error('Error:', error);
+    try {
+      const response = await fetch(`/api/modules/assignments/${assignmentId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete assignment');
       }
+      navigate('/dashboard/instructor/assignments');
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error deleting assignment');
     }
   };
 

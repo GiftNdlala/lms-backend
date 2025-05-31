@@ -10,30 +10,27 @@ const AssignmentsList = () => {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('/api/assignments/', {
+      const response = await fetch('/api/modules/assignments/', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAssignments(data);
-      } else {
-        setError('Failed to fetch assignments');
+      if (!response.ok) {
+        throw new Error('Failed to fetch assignments');
       }
+      const data = await response.json();
+      setAssignments(data);
     } catch (error) {
-      setError('Error fetching assignments');
       console.error('Error:', error);
+      setError('Error fetching assignments');
     } finally {
       setLoading(false);
     }
-  
+  };
+
   useEffect(() => {
     fetchAssignments();
   }, []);
-
-  };
 
   if (loading) return <div>Loading assignments...</div>;
   if (error) return <div>Error: {error}</div>;

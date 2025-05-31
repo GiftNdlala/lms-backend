@@ -17,7 +17,6 @@ import StudentCourseDetails from './pages/StudentCourseDetails';
 import AssignmentSubmission from './pages/AssignmentSubmission';
 import QuizAssessment from './pages/QuizAssessment';
 import StudentAnnouncement from './pages/StudentAnnouncement';
-import StudentAnnouncementChat from './pages/StudentAnnouncementChat';
 import Ewallet from './pages/ewallet';
 import AddStudent from './pages/instructor/AddStudent';
 import AddModule from './pages/instructor/AddModule';
@@ -38,6 +37,12 @@ import InstructorEwallet from './pages/instructor/InstructorEwallet';
 import ViewContent from './pages/student/ViewContent';
 import EditModule from './pages/instructor/EditModule';
 import ModuleContent from './pages/instructor/ModuleContent';
+import StudentChangePassword from './pages/student/StudentChangePassword';
+import StudentAnnouncementDetail from './pages/StudentAnnouncementDetail';
+import CreateQuiz from './pages/instructor/CreateQuiz';
+import StudentQuizzes from './pages/student/StudentQuizzes';
+import AllQuizzes from './pages/instructor/AllQuizzes';
+import QuizAttempt from './pages/student/QuizAttempt';
 
 
 function App() {
@@ -56,14 +61,17 @@ function App() {
         <Route path="/dashboard/student" element={<StudentLayout />}>
           <Route index element={<StudentDashboard />} />
           <Route path="profile" element={<StudentProfile />} />
+          <Route path="change-password" element={<StudentChangePassword />} />
           <Route path="grades" element={<StudentGrades />} />
           <Route path="grades/details/:courseId" element={<StudentGradesSub />} />
           <Route path="courses" element={<StudentCourses />} />
           <Route path="courses/:courseId" element={<StudentCourseDetails />} />
           <Route path="courses/:courseId/assignments/:assignmentId" element={<AssignmentSubmission />} />
-          <Route path="assessments" element={<QuizAssessment />} />
+          <Route path="assignments" element={<QuizAssessment />} />
+          <Route path="quizzes" element={<StudentQuizzes />} />
+          <Route path="quiz/:quizId/attempt/:attemptId" element={<QuizAttempt />} />
           <Route path="announcements" element={<StudentAnnouncement />} />
-          <Route path="announcements/:id" element={<StudentAnnouncementChat />} />
+          <Route path="announcements/:id" element={<StudentAnnouncementDetail />} />
           <Route path="ewallet" element={<Ewallet />} />
           {/* New module routes */}
           <Route path="modules" element={<StudentModules />} />
@@ -72,6 +80,8 @@ function App() {
           <Route path="modules/:moduleId/notifications" element={<StudentModuleDetail activeTab="notifications" />} />
           <Route path="student-modules" element={<StudentModules />} />
           <Route path="modules/new-venture-creation" element={<ViewContent />} />
+          <Route path="assignments/submit/:id" element={<AssignmentSubmission />} />
+          <Route path="assessments" element={<QuizAssessment />} />
         </Route>
 
         {/* Instructor routes */}
@@ -85,6 +95,10 @@ function App() {
           <Route path="modules/:moduleId/edit" element={<EditModule />} />
           <Route path="modules/:moduleId/content" element={<ModuleContent />} />
           <Route path="modules/:moduleId/quiz" element={<QuizAssessment />} />
+          <Route path="modules/:moduleId/create-quiz" element={<CreateQuiz />} />
+          
+          {/* Quiz routes */}
+          <Route path="quizzes" element={<AllQuizzes />} />
           
           {/* Assignment routes */}
           <Route path="assignments" element={<Assignments />} />

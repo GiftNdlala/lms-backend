@@ -3,8 +3,16 @@ import './AnnouncementSystem.css';
 import instructorApi from '../../services/instructorApi';
 
 const AnnouncementSystem = () => {
-  // Mock data for courses - TODO: Replace with API call
   const [modules, setModules] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    module: ''
+  });
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -18,33 +26,23 @@ const AnnouncementSystem = () => {
     fetchModules();
   }, []);
 
-  // Mock data for announcements - TODO: Replace with API call
-  const [announcements, setAnnouncements] = useState([
-    {
-      id: 1,
-      title: 'Important Course Update',
-      message: 'The deadline for Project 1 has been extended to next Friday.',
-      courseId: 1,
-      date: '2024-04-25'
-    },
-    {
-      id: 2,
-      title: 'New Module Available',
-      message: 'The new module on React Hooks is now available. Please complete it by next week.',
-      courseId: 2,
-      date: '2024-04-24'
+  useEffect(() => {
+    if (formData.module) {
+      fetchAnnouncements(formData.module);
     }
-  ]);
+  }, [formData.module]);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    message: '',
-    courseId: ''
-  });
-
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const fetchAnnouncements = async (moduleId) => {
+    setLoading(true);
+    try {
+      const data = await instructorApi.getModuleNotifications(moduleId);
+      setAnnouncements(data);
+    } catch (error) {
+      setMessage('Error fetching announcements.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,37 +56,19 @@ const AnnouncementSystem = () => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-
     try {
-      // TODO: Replace with actual API call
       if (editingId) {
-        // Update existing announcement
-        setAnnouncements(prev => 
-          prev.map(announcement => 
-            announcement.id === editingId
-              ? { ...formData, id: editingId, date: new Date().toISOString().split('T')[0] }
-              : announcement
-          )
-        );
+        await instructorApi.updateModuleNotification(formData.module, editingId, formData);
         setMessage('Announcement updated successfully!');
       } else {
-        // Create new announcement
-        const newAnnouncement = {
-          ...formData,
-          id: announcements.length + 1,
-          date: new Date().toISOString().split('T')[0]
-        };
-        setAnnouncements(prev => [...prev, newAnnouncement]);
+        await instructorApi.createModuleNotification(formData.module, formData);
         setMessage('Announcement created successfully!');
       }
-
-      // Reset form
-      setFormData({
-        title: '',
-        message: '',
-        courseId: ''
-      });
+      setFormData({ title: '', content: '', module: '' });
       setEditingId(null);
+      if (formData.module) {
+        fetchAnnouncements(formData.module);
+      }
     } catch (error) {
       setMessage('Error saving announcement. Please try again.');
     } finally {
@@ -99,19 +79,19 @@ const AnnouncementSystem = () => {
   const handleEdit = (announcement) => {
     setFormData({
       title: announcement.title,
-      message: announcement.message,
-      courseId: announcement.courseId
+      content: announcement.content,
+      module: announcement.module
     });
     setEditingId(announcement.id);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (moduleId, id) => {
     if (window.confirm('Are you sure you want to delete this announcement?')) {
       setLoading(true);
       try {
-        // TODO: Replace with actual API call
-        setAnnouncements(prev => prev.filter(announcement => announcement.id !== id));
+        await instructorApi.deleteModuleNotification(moduleId, id);
         setMessage('Announcement deleted successfully!');
+        fetchAnnouncements(moduleId);
       } catch (error) {
         setMessage('Error deleting announcement. Please try again.');
       } finally {
@@ -126,7 +106,6 @@ const AnnouncementSystem = () => {
 
       <div className="announcement-form">
         <h2>{editingId ? 'Edit Announcement' : 'Create New Announcement'}</h2>
-        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
@@ -139,13 +118,12 @@ const AnnouncementSystem = () => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="courseId">Select Module</label>
+            <label htmlFor="module">Select Module</label>
             <select
-              id="courseId"
-              name="courseId"
-              value={formData.courseId}
+              id="module"
+              name="module"
+              value={formData.module}
               onChange={handleChange}
               required
             >
@@ -157,19 +135,17 @@ const AnnouncementSystem = () => {
               ))}
             </select>
           </div>
-
           <div className="form-group">
-            <label htmlFor="message">Message</label>
+            <label htmlFor="content">Message</label>
             <textarea
-              id="message"
-              name="message"
-              value={formData.message}
+              id="content"
+              name="content"
+              value={formData.content}
               onChange={handleChange}
               required
               rows="5"
             />
           </div>
-
           <button type="submit" disabled={loading}>
             {loading ? 'Saving...' : (editingId ? 'Update Announcement' : 'Create Announcement')}
           </button>
@@ -178,7 +154,6 @@ const AnnouncementSystem = () => {
 
       <div className="announcements-list">
         <h2>Previous Announcements</h2>
-        
         {announcements.map(announcement => (
           <div key={announcement.id} className="announcement-card">
             <div className="announcement-header">
@@ -191,28 +166,25 @@ const AnnouncementSystem = () => {
                   Edit
                 </button>
                 <button 
-                  onClick={() => handleDelete(announcement.id)}
+                  onClick={() => handleDelete(formData.module, announcement.id)}
                   className="delete-btn"
                 >
                   Delete
                 </button>
               </div>
             </div>
-            
             <div className="announcement-meta">
-              <span className="course">
-                {modules.find(m => m.id === Number(announcement.courseId))?.title}
+              <span className="module">
+                {modules.find(m => m.id === Number(announcement.module))?.title || announcement.module_title}
               </span>
-              <span className="date">{announcement.date}</span>
+              <span className="date">{new Date(announcement.created_at).toLocaleDateString()}</span>
             </div>
-            
             <div className="announcement-message">
-              {announcement.message}
+              {announcement.content}
             </div>
           </div>
         ))}
       </div>
-
       {message && (
         <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
           {message}

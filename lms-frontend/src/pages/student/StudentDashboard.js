@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, CircularProgress } from '@mui/material';
 import { FaBook, FaGraduationCap, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
 import axios from 'axios';
+import StudentNotifications from '../../components/StudentNotifications';
 
 const StudentDashboard = () => {
   const [stats, setStats] = useState({
@@ -79,6 +80,11 @@ const StudentDashboard = () => {
             <Typography variant="h6" mt={2}>Pending Assignments</Typography>
             <Typography variant="h4">{stats.pendingAssignments}</Typography>
           </Paper>
+        </Grid>
+        
+        {/* Notifications Section */}
+        <Grid item xs={12}>
+          <StudentNotifications />
         </Grid>
       </Grid>
     </Box>

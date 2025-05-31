@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -41,7 +41,7 @@ api.interceptors.response.use(
           throw new Error('No refresh token available');
         }
 
-        const response = await axios.post(`${BASE_URL}/auth/token/refresh/`, {
+        const response = await axios.post(`${BASE_URL}/api/auth/token/refresh/`, {
           refresh: refreshToken,
         });
 
@@ -176,7 +176,7 @@ export const quizzes = {
   // Instructor endpoints
   getModuleQuizzes: async (moduleId) => {
     try {
-      const response = await api.get(`/modules/${moduleId}/quizzes/`);
+      const response = await api.get(`/api/modules/modules/${moduleId}/quizzes/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching module quizzes:', error);
@@ -186,7 +186,7 @@ export const quizzes = {
 
   createQuiz: async (moduleId, quizData) => {
     try {
-      const response = await api.post(`/modules/${moduleId}/quizzes/create/`, quizData);
+      const response = await api.post(`/api/modules/modules/${moduleId}/quizzes/create/`, quizData);
       return response.data;
     } catch (error) {
       console.error('Error creating quiz:', error);
@@ -196,7 +196,7 @@ export const quizzes = {
 
   addQuizQuestion: async (quizId, questionData) => {
     try {
-      const response = await api.post(`/quizzes/${quizId}/questions/`, questionData);
+      const response = await api.post(`/api/modules/quizzes/${quizId}/questions/`, questionData);
       return response.data;
     } catch (error) {
       console.error('Error adding quiz question:', error);
@@ -206,7 +206,7 @@ export const quizzes = {
 
   publishQuiz: async (quizId) => {
     try {
-      const response = await api.post(`/quizzes/${quizId}/publish/`);
+      const response = await api.post(`/api/modules/quizzes/${quizId}/publish/`);
       return response.data;
     } catch (error) {
       console.error('Error publishing quiz:', error);
@@ -217,7 +217,7 @@ export const quizzes = {
   // Student endpoints
   getStudentQuizzes: async (moduleId) => {
     try {
-      const response = await api.get(`/student/modules/${moduleId}/quizzes/`);
+      const response = await api.get(`/api/modules/student/modules/${moduleId}/quizzes/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching student quizzes:', error);
@@ -227,7 +227,7 @@ export const quizzes = {
 
   startQuizAttempt: async (quizId) => {
     try {
-      const response = await api.post(`/quizzes/${quizId}/attempt/`);
+      const response = await api.post(`/api/modules/quizzes/${quizId}/attempt/`);
       return response.data;
     } catch (error) {
       console.error('Error starting quiz attempt:', error);
@@ -237,7 +237,7 @@ export const quizzes = {
 
   submitQuizAttempt: async (attemptId, answers) => {
     try {
-      const response = await api.post(`/quiz-attempts/${attemptId}/submit/`, { answers });
+      const response = await api.post(`/api/modules/quiz-attempts/${attemptId}/submit/`, { answers });
       return response.data;
     } catch (error) {
       console.error('Error submitting quiz attempt:', error);
@@ -247,10 +247,10 @@ export const quizzes = {
 
   getQuizQuestions: async (quizId) => {
     try {
-      const response = await api.get(`/quizzes/${quizId}/get-questions/`);
+      const response = await api.get(`/api/modules/quizzes/${quizId}/get-questions/`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching quiz questions:', error);
+      console.error('Error getting quiz questions:', error);
       throw error;
     }
   }
@@ -260,7 +260,7 @@ export const quizzes = {
 export const auth = {
   login: async (credentials) => {
     try {
-      const response = await api.post('/accounts/login/', credentials);
+      const response = await api.post('/api/accounts/login/', credentials);
       const { access, refresh, user, role_data } = response.data;
       
       // Store tokens and user data
@@ -301,49 +301,49 @@ export const auth = {
 };
 
 export const instructor = {
-  addStudent: (data) => api.post('/accounts/instructors/add_student/', data),
-  getProfile: () => api.get('/accounts/instructors/profile/'),
-  getStudents: () => api.get('/accounts/instructors/students/'),
-  deleteStudent: (studentId) => api.delete(`/accounts/instructors/students/${studentId}/`),
-  getModules: () => api.get('/instructor/modules/'),
-  getModule: (id) => api.get(`/instructor/modules/${id}/`),
-  createModule: (data) => api.post('/instructor/modules/', data),
-  updateModule: (id, data) => api.put(`/instructor/modules/${id}/`, data),
-  deleteModule: (id) => api.delete(`/instructor/modules/${id}/`),
-  getModuleContent: (moduleId) => api.get(`/instructor/modules/${moduleId}/content/`),
-  addModuleContent: (moduleId, data) => api.post(`/instructor/modules/${moduleId}/content/`, data),
+  addStudent: (data) => api.post('/api/accounts/instructors/add_student/', data),
+  getProfile: () => api.get('/api/accounts/instructors/profile/'),
+  getStudents: () => api.get('/api/accounts/instructors/students/'),
+  deleteStudent: (studentId) => api.delete(`/api/accounts/instructors/students/${studentId}/`),
+  getModules: () => api.get('/api/modules/instructor/modules/'),
+  getModule: (id) => api.get(`/api/modules/instructor/modules/${id}/`),
+  createModule: (data) => api.post('/api/modules/instructor/modules/', data),
+  updateModule: (id, data) => api.put(`/api/modules/instructor/modules/${id}/`, data),
+  deleteModule: (id) => api.delete(`/api/modules/instructor/modules/${id}/`),
+  getModuleContent: (moduleId) => api.get(`/api/modules/instructor/modules/${moduleId}/content/`),
+  addModuleContent: (moduleId, data) => api.post(`/api/modules/instructor/modules/${moduleId}/content/`, data),
   updateModuleContent: (moduleId, contentId, data) => 
-    api.put(`/instructor/modules/${moduleId}/content/${contentId}/`, data),
+    api.put(`/api/modules/instructor/modules/${moduleId}/content/${contentId}/`, data),
   deleteModuleContent: (moduleId, contentId) => 
-    api.delete(`/instructor/modules/${moduleId}/content/${contentId}/`),
+    api.delete(`/api/modules/instructor/modules/${moduleId}/content/${contentId}/`),
 };
 
 export const courses = {
-  list: () => api.get('/courses/'),
-  getEnrolledCourses: () => api.get('/courses/enrolled/'),
-  getCourse: (id) => api.get(`/courses/${id}/`),
-  enroll: (courseId) => api.post(`/courses/${courseId}/enroll/`),
-  unenroll: (courseId) => api.post(`/courses/${courseId}/unenroll/`),
-  getModules: (courseId) => api.get(`/courses/${courseId}/modules/`),
-  getModule: (courseId, moduleId) => api.get(`/courses/${courseId}/modules/${moduleId}/`),
-  completeModule: (courseId, moduleId) => api.post(`/courses/${courseId}/modules/${moduleId}/complete/`),
-  getProgress: (courseId) => api.get(`/courses/${courseId}/progress/`),
+  list: () => api.get('/api/courses/'),
+  getEnrolledCourses: () => api.get('/api/courses/enrolled/'),
+  getCourse: (id) => api.get(`/api/courses/${id}/`),
+  enroll: (courseId) => api.post(`/api/courses/${courseId}/enroll/`),
+  unenroll: (courseId) => api.post(`/api/courses/${courseId}/unenroll/`),
+  getModules: (courseId) => api.get(`/api/courses/${courseId}/modules/`),
+  getModule: (courseId, moduleId) => api.get(`/api/courses/${courseId}/modules/${moduleId}/`),
+  completeModule: (courseId, moduleId) => api.post(`/api/courses/${courseId}/modules/${moduleId}/complete/`),
+  getProgress: (courseId) => api.get(`/api/courses/${courseId}/progress/`),
 };
 
 export const assignments = {
-  list: (courseId) => api.get(`/courses/${courseId}/assignments/`),
-  get: (courseId, assignmentId) => api.get(`/courses/${courseId}/assignments/${assignmentId}/`),
+  list: (courseId) => api.get(`/api/courses/${courseId}/assignments/`),
+  get: (courseId, assignmentId) => api.get(`/api/courses/${courseId}/assignments/${assignmentId}/`),
   submit: (courseId, assignmentId, data) => 
-    api.post(`/courses/${courseId}/assignments/${assignmentId}/submit/`, data),
+    api.post(`/api/courses/${courseId}/assignments/${assignmentId}/submit/`, data),
   getSubmissions: (courseId, assignmentId) => 
-    api.get(`/courses/${courseId}/assignments/${assignmentId}/submissions/`),
+    api.get(`/api/courses/${courseId}/assignments/${assignmentId}/submissions/`),
 };
 
 export const grades = {
-  getCourseGrades: (courseId) => api.get(`/courses/${courseId}/grades/`),
+  getCourseGrades: (courseId) => api.get(`/api/courses/${courseId}/grades/`),
   getAssignmentGrade: (courseId, assignmentId) => 
-    api.get(`/courses/${courseId}/assignments/${assignmentId}/grade/`),
-  getAllGrades: () => api.get('/grades/'),
+    api.get(`/api/courses/${courseId}/assignments/${assignmentId}/grade/`),
+  getAllGrades: () => api.get('/api/grades/'),
 };
 
 // Default export for backward compatibility

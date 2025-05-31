@@ -10,7 +10,6 @@ const GradeStudent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [submissions, setSubmissions] = useState([]);
-  const [students, setStudents] = useState([]);
   const [subLoading, setSubLoading] = useState(false);
   const [subError, setSubError] = useState('');
   const [updateMsg, setUpdateMsg] = useState('');
@@ -72,26 +71,7 @@ const GradeStudent = () => {
       setSubLoading(true);
       setSubError('');
       setSubmissions([]);
-      setStudents([]);
       try {
-        // Fetch module details to get student IDs
-        const moduleRes = await axios.get(`http://localhost:8000/api/modules/instructor/modules/${selectedModule.id}/`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
-        const studentIds = moduleRes.data.students || [];
-        let studentsData = [];
-        if (studentIds.length > 0) {
-          // Fetch all students and filter by IDs (or fetch individually if needed)
-          const allStudentsRes = await axios.get('http://localhost:8000/api/accounts/instructors/students/', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
-          });
-          studentsData = allStudentsRes.data.filter(s => studentIds.includes(s.id));
-        }
-        setStudents(studentsData);
         // Fetch assignments for the module
         const assignmentsRes = await axios.get(`http://localhost:8000/api/modules/instructor/modules/${selectedModule.id}/assignments/`, {
           headers: {
@@ -138,13 +118,16 @@ const GradeStudent = () => {
   };
 
   // Update grade/feedback
-  const handleUpdate = async (submissionId) => {
+  const handleUpdate = async (submissionId, assignment) => {
     setUpdateMsg('');
     try {
-      const { score, feedback } = editGrades[submissionId] || {};
+      const { percent, feedback } = editGrades[submissionId] || {};
+      const grade = percent
+        ? Math.round((parseFloat(percent) / 100) * (assignment.total_marks || 100))
+        : null;
       await axios.patch(
         `http://localhost:8000/api/assignments/submissions/${submissionId}/`,
-        { score, feedback },
+        { grade, feedback },
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -210,44 +193,55 @@ const GradeStudent = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(students) && students.length === 0 ? (
-                  <tr><td colSpan="7">No students found for this module.</td></tr>
+                {(submissions?.assignments ?? []).length === 0 ? (
+                  <tr><td colSpan="8">No assignments found.</td></tr>
                 ) : (
-                  students.map(student => (
-                    submissions.assignments && submissions.assignments.length > 0 ? (
-                      submissions.assignments.map(assignment => {
-                        const sub = submissions.submissionMap[student.id]?.[assignment.id];
-                        return (
-                          <tr key={`${student.id}-${assignment.id}`}>
-                            <td>{student.name || student.user?.first_name + ' ' + student.user?.last_name}</td>
-                            <td>{assignment.title}</td>
-                            {sub ? (
-                              <>
-                                <td>{sub.created_at || '-'}</td>
-                                <td>{sub.pdf ? <a href={sub.pdf} target="_blank" rel="noopener noreferrer">View PDF</a> : '--'}</td>
-                                <td><input type="number" value={editGrades[sub.id]?.score ?? sub.score ?? ''} onChange={e => handleEditChange(sub.id, 'score', e.target.value)} /></td>
-                                <td><input type="text" value={editGrades[sub.id]?.feedback ?? sub.feedback ?? ''} onChange={e => handleEditChange(sub.id, 'feedback', e.target.value)} /></td>
-                                <td><button onClick={() => handleUpdate(sub.id)}>Save</button></td>
-                              </>
-                            ) : (
-                              <>
-                                <td>--</td>
-                                <td>--</td>
-                                <td>--</td>
-                                <td>--</td>
-                                <td>--</td>
-                              </>
-                            )}
-                          </tr>
-                        );
-                      })
+                  (submissions?.assignments ?? []).map(assignment =>
+                    assignment.submissions && assignment.submissions.length > 0 ? (
+                      assignment.submissions.map(sub => (
+                        <tr key={sub.id}>
+                          <td>{sub.student_name}</td>
+                          <td>{assignment.title}</td>
+                          <td>{sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : '--'}</td>
+                          <td>
+                            {sub.submitted_file ? (
+                              <a href={sub.submitted_file} target="_blank" rel="noopener noreferrer">
+                                {sub.submitted_file.split('/').pop()}
+                              </a>
+                            ) : '--'}
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={editGrades[sub.id]?.percent ?? ''}
+                              onChange={e => handleEditChange(sub.id, 'percent', e.target.value)}
+                              style={{ width: 60 }}
+                              placeholder="%"
+                            />
+                            <span style={{ marginLeft: 4 }}>%</span>
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editGrades[sub.id]?.feedback ?? sub.feedback ?? ''}
+                              onChange={e => handleEditChange(sub.id, 'feedback', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <button onClick={() => handleUpdate(sub.id, assignment)}>Save</button>
+                          </td>
+                        </tr>
+                      ))
                     ) : (
-                      <tr key={student.id}>
-                        <td>{student.name || student.user?.first_name + ' ' + student.user?.last_name}</td>
-                        <td colSpan="6" style={{ textAlign: 'center', color: '#888' }}>No assignments for this module.</td>
+                      <tr key={assignment.id + '-no-sub'}>
+                        <td colSpan="8" style={{ textAlign: 'center', color: '#888' }}>
+                          No submissions for {assignment.title}.
+                        </td>
                       </tr>
                     )
-                  ))
+                  )
                 )}
               </tbody>
             </table>

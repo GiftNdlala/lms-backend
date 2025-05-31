@@ -23,6 +23,11 @@ const menuItems = [
     path: '/dashboard/instructor/modules'
   },
   {
+    text: 'All Quizzes',
+    icon: <AssignmentIcon />,
+    path: '/dashboard/instructor/quizzes'
+  },
+  {
     text: 'Assignments',
     icon: <AssignmentIcon />,
     subItems: [

@@ -5,7 +5,7 @@ from .models import (
     StudentProgress, CourseEnrollment,
     EWallet, Transaction, WithdrawalRequest,
     Assessment, Question, AssessmentAssignment,
-    StudentAnswer, AssessmentGrade
+    StudentAnswer, AssessmentGrade, Announcement
 )
 from accounts.models import Student
 
@@ -162,4 +162,13 @@ class StudentSerializer(serializers.ModelSerializer):
             'first_name': obj.user.first_name,
             'last_name': obj.user.last_name,
             'email': obj.user.email
-        } 
+        }
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True)
+
+    class Meta:
+        model = Announcement
+        fields = ['id', 'course', 'course_title', 'title', 'content', 'created_by', 'created_by_name', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_by', 'created_by_name', 'created_at', 'updated_at', 'course_title'] 

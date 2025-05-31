@@ -54,10 +54,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    ewallet_balance = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
         fields = '__all__'
+
+    def get_ewallet_balance(self, obj):
+        # Use the ewallet related_name from assessments
+        if hasattr(obj.user, 'ewallet') and obj.user.ewallet:
+            return obj.user.ewallet.balance
+        return 0.0
 
 class InstructorSerializer(serializers.ModelSerializer):
     user = UserSerializer()

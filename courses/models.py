@@ -6,22 +6,19 @@ from decimal import Decimal
 
 
 class Module(models.Model):
-    code = models.CharField(max_length=20, unique=True, help_text="Unique module code (e.g., MOD101)", null=True, blank=True)
+    code = models.CharField(max_length=20, unique=True, help_text="Unique module code (e.g., MOD101)")
     title = models.CharField(max_length=200)
     description = models.TextField()
     duration = models.DurationField(help_text="Duration of the module (e.g., 2 hours, 30 minutes)", null=True, blank=True)
     credits = models.PositiveIntegerField(default=0, help_text="Number of credits for this module", null=True, blank=True)
     instructor = models.ForeignKey(Instructor, on_delete=models.SET_NULL, related_name='created_modules', null=True, blank=True)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='modules', null=True, blank=True)
-    order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    students = models.ManyToManyField(Student, through='ModuleEnrollment', related_name='course_module_enrollments')
+    students = models.ManyToManyField(Student, through='ModuleEnrollment', related_name='enrolled_modules')
 
     class Meta:
-        ordering = ['order']
-        unique_together = ['course', 'order']
+        ordering = ['code']
 
     def __str__(self):
         return f"{self.code} - {self.title}" if self.code else self.title
@@ -174,7 +171,7 @@ class Comment(models.Model):
         return f"Comment by {self.created_by.username} on {self.discussion.title}"
 
 class EWallet(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='ewallet')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='course_ewallet')
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     last_updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)

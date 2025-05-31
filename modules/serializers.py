@@ -3,7 +3,8 @@ from accounts.models import Student
 from .models import (
     Module, ModuleContent, StudentModuleProgress, ModuleNotification,
     NotificationComment, ModuleTest, Quiz, QuizQuestion, 
-    QuizChoice, QuizAttempt, QuizAnswer, ModuleTemplate
+    QuizChoice, QuizAttempt, QuizAnswer, ModuleTemplate,
+    SectionContent, ModuleSection
 )
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -36,10 +37,11 @@ class NotificationCommentSerializer(serializers.ModelSerializer):
 class ModuleNotificationSerializer(serializers.ModelSerializer):
     comments = NotificationCommentSerializer(many=True, read_only=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    module_name = serializers.CharField(source='module.title', read_only=True)
 
     class Meta:
         model = ModuleNotification
-        fields = ['id', 'title', 'content', 'created_at', 'created_by_name', 'comments']
+        fields = ['id', 'title', 'content', 'created_at', 'created_by_name', 'comments', 'module_name']
         read_only_fields = ['created_by']
 
 class ModuleTestSerializer(serializers.ModelSerializer):
@@ -47,21 +49,45 @@ class ModuleTestSerializer(serializers.ModelSerializer):
         model = ModuleTest
         fields = ['id', 'title', 'description', 'date', 'duration']
 
+class SectionContentSerializer(serializers.ModelSerializer):
+    uploaded_by_name = serializers.CharField(source='uploaded_by.username', read_only=True)
+
+    class Meta:
+        model = SectionContent
+        fields = [
+            'id', 'section', 'title', 'file', 'file_type', 'text_content',
+            'order', 'uploaded_at', 'uploaded_by', 'uploaded_by_name'
+        ]
+        read_only_fields = ['uploaded_at', 'uploaded_by', 'uploaded_by_name']
+
+class ModuleSectionSerializer(serializers.ModelSerializer):
+    contents = SectionContentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ModuleSection
+        fields = [
+            'id', 'module', 'title', 'description', 'order',
+            'created_at', 'updated_at', 'contents'
+        ]
+        read_only_fields = ['created_at', 'updated_at', 'contents']
+
 class ModuleSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField()
     contents = serializers.SerializerMethodField()
     notifications = serializers.SerializerMethodField()
     tests = serializers.SerializerMethodField()
     students = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all(), many=True, required=False)
+    sections = ModuleSectionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Module
         fields = [
             'id', 'code', 'title', 'description', 'duration', 'credits',
-            'instructor', 'instructor_name', 'course', 'order', 'contents', 
-            'notifications', 'tests', 'created_at', 'updated_at', 'students'
+            'instructor', 'instructor_name', 'contents', 'notifications', 
+            'tests', 'created_at', 'updated_at', 'students', 'is_active',
+            'sections'
         ]
-        read_only_fields = ['instructor_name', 'contents', 'notifications', 'tests']
+        read_only_fields = ['instructor_name', 'contents', 'notifications', 'tests', 'sections']
 
     def get_instructor_name(self, obj):
         return obj.instructor.user.get_full_name() if obj.instructor else None

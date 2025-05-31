@@ -11,6 +11,7 @@ api_patterns = [
     path('accounts/', include('accounts.urls')),
     path('modules/', include('modules.urls')),
     path('assignments/', include('assignments.urls')),
+    path('assessments/', include('assessments.urls')),
 ]
 
 urlpatterns = [

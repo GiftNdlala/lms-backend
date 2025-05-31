@@ -14,7 +14,6 @@ import {
   Alert
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import instructorApi from '../../../services/instructorApi';
 
 const AssignmentList = () => {
@@ -28,17 +27,21 @@ const AssignmentList = () => {
   }, []);
 
   const fetchAssignments = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:8000/api/assignments/', {
+      const response = await fetch('/api/modules/assignments/', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
       });
-      setAssignments(response.data);
+      if (!response.ok) {
+        throw new Error('Failed to fetch assignments');
+      }
+      const data = await response.json();
+      setAssignments(data);
     } catch (error) {
       console.error('Failed to fetch assignments:', error);
-      setError('Failed to load assignments. Please try again later.');
+      setError('Failed to load assignments');
     } finally {
       setLoading(false);
     }

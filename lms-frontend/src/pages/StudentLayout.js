@@ -24,6 +24,7 @@ const StudentLayout = () => {
             <li><Link to="/dashboard/student/modules">My Modules</Link></li>
             <li><Link to="/dashboard/student/grades">Grades</Link></li>
             <li><Link to="/dashboard/student/assessments">Assessments</Link></li>
+            <li><Link to="/dashboard/student/quizzes">Quizzes</Link></li>
             <li><Link to="/dashboard/student/announcements">Announcements</Link></li>
             <li><Link to="/dashboard/student/ewallet" className="achievement-link">🏆 Achievements</Link></li>
             <li><Link to="/logout" className="signout-link">🚪 Sign Out</Link></li>
@@ -32,7 +33,7 @@ const StudentLayout = () => {
       </aside>
 
       <main className="main-content">
-        <Outlet /> 
+        <Outlet />
       </main>
     </div>
   );

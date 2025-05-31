@@ -107,3 +107,73 @@ class Instructor(models.Model):
         import string
         random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
         return f"{self.employee_id}_{random_suffix}"
+
+class EWallet(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='account_ewallet')
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.student.user.username}'s E-Wallet"
+
+    def add_funds(self, amount, reason):
+        self.balance += amount
+        self.save()
+        EWalletTransaction.objects.create(
+            ewallet=self,
+            amount=amount,
+            transaction_type='credit',
+            reason=reason
+        )
+
+    def deduct_funds(self, amount, reason):
+        if self.balance >= amount:
+            self.balance -= amount
+            self.save()
+            EWalletTransaction.objects.create(
+                ewallet=self,
+                amount=amount,
+                transaction_type='debit',
+                reason=reason
+            )
+            return True
+        return False
+
+class EWalletTransaction(models.Model):
+    ewallet = models.ForeignKey(EWallet, on_delete=models.CASCADE, related_name='transactions')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=10, choices=[('credit', 'Credit'), ('debit', 'Debit')])
+    reason = models.CharField(max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.transaction_type} of {self.amount} - {self.reason}"
+
+class Achievement(models.Model):
+    ACHIEVEMENT_TYPES = [
+        ('quiz', 'Quiz Achievement'),
+        ('module', 'Module Achievement'),
+        ('streak', 'Learning Streak'),
+        ('grade', 'Grade Achievement'),
+    ]
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='achievements')
+    type = models.CharField(max_length=20, choices=ACHIEVEMENT_TYPES)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    points = models.PositiveIntegerField(default=0)
+    earned_at = models.DateTimeField(auto_now_add=True)
+    related_quiz = models.ForeignKey('modules.Quiz', on_delete=models.SET_NULL, null=True, blank=True)
+    related_module = models.ForeignKey('courses.Module', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.title}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # If this is a new achievement, add points to e-wallet
+        if is_new and self.points > 0:
+            ewallet, created = EWallet.objects.get_or_create(student=self.student)
+            ewallet.add_funds(self.points, f"Achievement: {self.title}")

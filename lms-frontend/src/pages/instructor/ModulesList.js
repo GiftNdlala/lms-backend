@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaBook } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaBook, FaQuestionCircle } from 'react-icons/fa';
 import instructorApi from '../../services/instructorApi';
 import './InstructorStyles.css';
 
@@ -134,6 +134,13 @@ const ModulesList = () => {
                   onClick={() => navigate(`/dashboard/instructor/modules/${module.id}/content`)}
                 >
                   <FaBook /> Manage Content
+                </button>
+                <button
+                  className="icon-button"
+                  title="Create Quiz"
+                  onClick={() => navigate(`/dashboard/instructor/modules/${module.id}/create-quiz`)}
+                >
+                  <FaQuestionCircle /> Create Quiz
                 </button>
                 <button
                   className="icon-button"

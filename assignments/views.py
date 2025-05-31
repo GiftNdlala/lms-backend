@@ -7,6 +7,8 @@ from .models import Assignment
 from courses.models import Module
 from .serializers import AssignmentSerializer
 import logging
+from modules.models import QuizAnswer, QuizAttempt
+
 
 logger = logging.getLogger(__name__)
 

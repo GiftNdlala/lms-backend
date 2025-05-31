@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './DashboardStyles.css';
 import studentApi from '../services/studentApi';
+import { useNavigate } from 'react-router-dom';
 
 function StudentProfile() {
   const [profile, setProfile] = useState({
@@ -19,12 +20,28 @@ function StudentProfile() {
       "Push notifications"
     ]
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await studentApi.getProfile();
-        setProfile(response);
+        setProfile({
+          fullName: response.user ? `${response.user.first_name} ${response.user.last_name}` : '',
+          email: response.user ? response.user.email : '',
+          studentId: response.student_id || '',
+          program: response.program || '',
+          yearOfStudy: response.year_of_study || '',
+          enrollmentDate: response.enrolled_date || '',
+          gender: response.user && response.user.gender ? response.user.gender : '',
+          language: 'System Default (English - United States)',
+          privacy: 'Only instructors can view my profile information',
+          notifications: [
+            'Stream notifications',
+            'Email notifications',
+            'Push notifications'
+          ]
+        });
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Set default profile data if API call fails
@@ -68,10 +85,6 @@ function StudentProfile() {
                   <td>{profile.program}</td>
                 </tr>
                 <tr>
-                  <td>Year of Study</td>
-                  <td>{profile.yearOfStudy}</td>
-                </tr>
-                <tr>
                   <td>Enrollment Date</td>
                   <td>{profile.enrollmentDate}</td>
                 </tr>
@@ -96,13 +109,9 @@ function StudentProfile() {
                   <td>{profile.email}</td>
                 </tr>
                 <tr>
-                  <td>Gender</td>
-                  <td>{profile.gender}</td>
-                </tr>
-                <tr>
                   <td>Password</td>
                   <td>
-                    <button className="change-password-btn">
+                    <button className="change-password-btn" onClick={() => navigate('/dashboard/student/change-password')}>
                       Change Password
                     </button>
                   </td>

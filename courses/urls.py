@@ -34,6 +34,10 @@ progress_router.register(r'progress', views.StudentProgressViewSet, basename='pr
 enrollment_router = DefaultRouter()
 enrollment_router.register(r'enrollments', views.CourseEnrollmentViewSet, basename='enrollments')
 
+# Announcement router
+announcement_router = DefaultRouter()
+announcement_router.register(r'announcements', views.AnnouncementViewSet, basename='announcements')
+
 urlpatterns = [
     # Course base routes
     path('', include(router.urls)),
@@ -56,4 +60,7 @@ urlpatterns = [
     
     # E-Wallet routes
     path('ewallets/', include(ewallet_router.urls)),
+    
+    # Announcement routes
+    path('announcements/', include(announcement_router.urls)),
 ] 

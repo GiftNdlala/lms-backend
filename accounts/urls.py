@@ -14,4 +14,6 @@ urlpatterns = [
     path('login/', login, name='login'),
     path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('', include(router.urls)),
+    path('student/profile/', StudentViewSet.as_view({'get': 'profile'}), name='student-profile'),
+    path('instructor/profile/', InstructorViewSet.as_view({'get': 'profile'}), name='instructor-profile'),
 ] 

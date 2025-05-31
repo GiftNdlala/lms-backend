@@ -164,6 +164,17 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = EnrollmentSerializer(enrollment)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def profile(self, request):
+        """Get the current student's profile"""
+        if not hasattr(request.user, 'student'):
+            return Response(
+                {"detail": "User is not a student"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        student = request.user.student
+        serializer = self.get_serializer(student)
+        return Response(serializer.data)
 
 class InstructorViewSet(viewsets.ModelViewSet):
     queryset = Instructor.objects.all()

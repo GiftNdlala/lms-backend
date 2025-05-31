@@ -23,6 +23,7 @@ import {
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import axios from 'axios';
 import './InstructorEwallet.css';
+import api from '../../services/api';
 
 const InstructorEwallet = () => {
   const [students, setStudents] = useState([]);
@@ -32,6 +33,9 @@ const InstructorEwallet = () => {
   const [balanceAmount, setBalanceAmount] = useState('');
   const [showBalanceDialog, setShowBalanceDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [reference, setReference] = useState('');
+  const [instructorName, setInstructorName] = useState('');
+  const [instructorSurname, setInstructorSurname] = useState('');
 
   useEffect(() => {
     fetchStudents();
@@ -64,31 +68,29 @@ const InstructorEwallet = () => {
   const handleEditBalance = (student) => {
     setSelectedStudent(student);
     setBalanceAmount(student.ewallet?.balance || '0');
+    setReference('');
+    setInstructorName('');
+    setInstructorSurname('');
     setShowBalanceDialog(true);
   };
 
   const handleBalanceSubmit = async () => {
     try {
-      // First update the e-wallet balance
-      await axios.patch(`/api/ewallets/${selectedStudent.ewallet.id}/`, {
-        balance: parseFloat(balanceAmount)
+      const studentId = selectedStudent.user.id;
+      const url = `/api/assessments/ewallets/${studentId}/update_balance/`;
+      await api.post(url, {
+        new_balance: parseFloat(balanceAmount),
+        reference: reference || 'Instructor adjustment',
+        instructor_name: instructorName,
+        instructor_surname: instructorSurname
       });
-
-      // Then create a transaction record
-      await axios.post('/api/transactions/', {
-        ewallet: selectedStudent.ewallet.id,
-        amount: parseFloat(balanceAmount) - (selectedStudent.ewallet?.balance || 0),
-        transaction_type: 'balance_adjustment',
-        description: 'Balance adjusted by instructor',
-        status: 'completed'
-      });
-
       setSuccessMessage(`Successfully updated balance for ${selectedStudent.user.first_name} ${selectedStudent.user.last_name}`);
       setShowBalanceDialog(false);
       setBalanceAmount('');
+      setReference('');
+      setInstructorName('');
+      setInstructorSurname('');
       setSelectedStudent(null);
-      
-      // Refresh student data to show updated balances
       fetchStudents();
     } catch (error) {
       console.error('Failed to update balance:', error);
@@ -141,7 +143,7 @@ const InstructorEwallet = () => {
                 </TableCell>
                 <TableCell>{student.student_id}</TableCell>
                 <TableCell>{student.program}</TableCell>
-                <TableCell>₹{student.ewallet?.balance?.toFixed(2) || '0.00'}</TableCell>
+                <TableCell>₹{typeof student.ewallet_balance !== 'undefined' ? Number(student.ewallet_balance).toFixed(2) : '0.00'}</TableCell>
                 <TableCell>
                   <Tooltip title="Edit Balance">
                     <IconButton
@@ -173,10 +175,40 @@ const InstructorEwallet = () => {
             value={balanceAmount}
             onChange={(e) => setBalanceAmount(e.target.value)}
           />
+          <TextField
+            margin="dense"
+            label="Reference / Description"
+            type="text"
+            fullWidth
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Your Name"
+            type="text"
+            fullWidth
+            required
+            value={instructorName}
+            onChange={(e) => setInstructorName(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Your Surname"
+            type="text"
+            fullWidth
+            required
+            value={instructorSurname}
+            onChange={(e) => setInstructorSurname(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowBalanceDialog(false)}>Cancel</Button>
-          <Button onClick={handleBalanceSubmit} color="primary">
+          <Button 
+            onClick={handleBalanceSubmit} 
+            color="primary"
+            disabled={!instructorName || !instructorSurname}
+          >
             Update
           </Button>
         </DialogActions>

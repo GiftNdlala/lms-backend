@@ -18,7 +18,7 @@ import {
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import StarIcon from '@mui/icons-material/Star';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import axios from 'axios';
+import api from '../services/api';
 
 const Ewallet = () => {
   const [balance, setBalance] = useState(0);
@@ -26,20 +26,38 @@ const Ewallet = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchEWalletData();
+    // Check if wallet info is in localStorage (from quiz submission)
+    const cachedBalance = localStorage.getItem('ewallet_balance');
+    const cachedTransactions = localStorage.getItem('ewallet_transactions');
+    if (cachedBalance && cachedTransactions) {
+      setBalance(Number(cachedBalance));
+      setTransactions(JSON.parse(cachedTransactions));
+      // Clear cache after using
+      localStorage.removeItem('ewallet_balance');
+      localStorage.removeItem('ewallet_transactions');
+    } else {
+      fetchEWalletData();
+    }
   }, []);
 
   const fetchEWalletData = async () => {
     try {
       setLoading(true);
-      const [ewalletResponse, transactionsResponse] = await Promise.all([
-        axios.get('/api/ewallets/'),
-        axios.get('/api/transactions/')
-      ]);
-      
+      // Try to get the student's ewallet_balance from the students API
+      const studentProfileRes = await api.get('/api/accounts/student/profile/');
+      let balanceValue = 0;
+      if (studentProfileRes.data && typeof studentProfileRes.data.ewallet_balance !== 'undefined') {
+        balanceValue = Number(studentProfileRes.data.ewallet_balance);
+      } else {
+        // Fallback to the old logic if ewallet_balance is not present
+        const ewalletResponse = await api.get('/api/assessments/ewallets/');
       if (ewalletResponse.data && ewalletResponse.data.length > 0) {
-        setBalance(ewalletResponse.data[0].balance);
+          balanceValue = Number(ewalletResponse.data[0].balance);
+        }
       }
+      setBalance(balanceValue);
+      // Always fetch transactions as before
+      const transactionsResponse = await api.get('/api/assessments/transactions/');
       setTransactions(transactionsResponse.data);
     } catch (error) {
       console.error('Failed to fetch e-wallet data:', error);
@@ -63,128 +81,133 @@ const Ewallet = () => {
     const types = {
       'assessment_reward': 'Assessment Reward',
       'withdrawal_approved': 'Withdrawal',
+      'credit': 'Credit',
+      'debit': 'Debit'
     };
     return types[type] || type;
   };
 
-  return (
-    <Box sx={{ p: 3, maxWidth: '1200px', margin: '0 auto' }}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 4,
-          fontWeight: 700,
-          background: 'linear-gradient(45deg, #8231D2, #4CAF50)',
-          backgroundClip: 'text',
-          textFillColor: 'transparent',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}
-      >
-        Achievement Wallet
-      </Typography>
-
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress sx={{ color: '#8231D2' }} />
+  const formatDescription = (description) => {
+    // Split the description into reference and instructor info
+    const parts = description.split(' - ');
+    if (parts.length === 2) {
+      return (
+        <Box>
+          <Typography variant="body2">{parts[0]}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            {parts[1]}
+          </Typography>
         </Box>
-      ) : (
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                background: 'linear-gradient(135deg, #8231D2 0%, #4CAF50 100%)',
-                color: 'white',
-                borderRadius: '16px',
-                boxShadow: '0 8px 32px rgba(130, 49, 210, 0.2)'
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <AccountBalanceWalletIcon sx={{ fontSize: 40, mr: 2 }} />
-                  <Typography variant="h6">Current Balance</Typography>
-                </Box>
-                <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                  ₹{balance.toFixed(2)}
-                </Typography>
-                {balance >= 500 && (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}>
-                    <Typography variant="body2" sx={{ color: '#FFD700', fontWeight: 600 }}>
-                      You are eligible for withdrawal!
-                    </Typography>
-                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-                      Please show this balance to your instructor for processing.
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+      );
+    }
+    return description;
+  };
 
-          <Grid item xs={12} md={8}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: '16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Transaction History
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              p: 3,
+              borderRadius: '16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <AccountBalanceWalletIcon sx={{ fontSize: 40, color: '#8231D2', mr: 2 }} />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  E-Wallet Balance
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#8231D2' }}>
+                ₹{balance.toFixed(2)}
               </Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Amount</TableCell>
-                      <TableCell>Description</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow
-                        key={transaction.id}
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: 'rgba(130, 49, 210, 0.05)'
-                          }
-                        }}
-                      >
-                        <TableCell>
-                          {new Date(transaction.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            {getTransactionIcon(transaction.transaction_type)}
-                            <Typography sx={{ ml: 1 }}>
-                              {getTransactionType(transaction.transaction_type)}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={`${transaction.amount > 0 ? '+' : ''}₹${transaction.amount.toFixed(2)}`}
-                            sx={{
-                              backgroundColor: transaction.amount > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                              color: transaction.amount > 0 ? '#4CAF50' : '#F44336'
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>{transaction.description}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </Grid>
+            </CardContent>
+          </Card>
         </Grid>
-      )}
+
+        <Grid item xs={12} md={8}>
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: '16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Transaction History
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Amount</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Reference</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transactions.map((transaction) => (
+                    <TableRow
+                      key={transaction.reference_number}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgba(130, 49, 210, 0.05)'
+                        }
+                      }}
+                    >
+                      <TableCell>
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {getTransactionIcon(transaction.type)}
+                          <Typography sx={{ ml: 1 }}>
+                            {getTransactionType(transaction.type)}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={`${Number(transaction.amount) > 0 ? '+' : ''}₹${Number(transaction.amount).toFixed(2)}`}
+                          sx={{
+                            backgroundColor: Number(transaction.amount) > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                            color: Number(transaction.amount) > 0 ? '#4CAF50' : '#F44336'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>{formatDescription(transaction.description)}</TableCell>
+                      <TableCell>
+                        <Typography variant="caption" color="text.secondary">
+                          {transaction.reference_number}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

@@ -10,7 +10,7 @@ from .models import (
     StudentProgress, CourseEnrollment,
     EWallet, Transaction, WithdrawalRequest,
     Assessment, Question, AssessmentAssignment,
-    StudentAnswer, AssessmentGrade
+    StudentAnswer, AssessmentGrade, Announcement
 )
 from .serializers import (
     CourseDetailSerializer, CourseListSerializer, ModuleSerializer,
@@ -18,7 +18,7 @@ from .serializers import (
     StudentProgressSerializer, CourseEnrollmentSerializer,
     EWalletSerializer, TransactionSerializer, WithdrawalRequestSerializer,
     AssessmentSerializer, QuestionSerializer, AssessmentAssignmentSerializer,
-    StudentAnswerSerializer, AssessmentGradeSerializer
+    StudentAnswerSerializer, AssessmentGradeSerializer, AnnouncementSerializer
 )
 from django.db.models import Sum
 from decimal import Decimal
@@ -479,4 +479,30 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.role == 'instructor':
             return CourseEnrollment.objects.filter(course__instructor=self.request.user)
-        return CourseEnrollment.objects.filter(student__user=self.request.user) 
+        return CourseEnrollment.objects.filter(student__user=self.request.user)
+
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all().order_by('-created_at')
+    serializer_class = AnnouncementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Announcement.objects.all().order_by('-created_at')
+        course_id = self.request.query_params.get('course')
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+        # Students see only announcements for their courses
+        if hasattr(self.request.user, 'student'):
+            queryset = queryset.filter(course__enrollments__student__user=self.request.user)
+        # Instructors see only their courses
+        elif hasattr(self.request.user, 'instructor'):
+            queryset = queryset.filter(course__instructor=self.request.user)
+        return queryset.distinct()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated(), permissions.IsAdminUser() if not hasattr(self.request.user, 'instructor') else permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticated()] 

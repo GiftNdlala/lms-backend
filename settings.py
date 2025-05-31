@@ -52,8 +52,8 @@ INSTALLED_APPS = [
     'django_filters',
     'accounts',
     'courses',
-    'modules',
     'assessments',
+    'assignments',
 ]
 
 
@@ -241,7 +241,7 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_HTTPONLY = Falseohky help me 
+CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 
@@ -255,6 +255,28 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'USER_ID_FIELD': 'username',
     'USER_ID_CLAIM': 'username',
+}
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'assessments': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
 }
 
 # Djoser settings

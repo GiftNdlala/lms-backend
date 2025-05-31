@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'courses.apps.CoursesConfig',
     'modules.apps.ModulesConfig',
     'assignments',
-    
+    'assessments.apps.AssessmentsConfig',
 ]
 
 MIDDLEWARE = [
