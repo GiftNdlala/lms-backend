@@ -26,6 +26,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.exceptions import TokenError
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from courses.models import Module
 #from .serializers import ModuleSerializer
 
@@ -338,6 +340,7 @@ class CustomTokenRefreshView(TokenRefreshView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):

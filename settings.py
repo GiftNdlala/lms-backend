@@ -59,9 +59,11 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # Temporarily disable CSRF for debugging
+    # 'django.middleware.csrf.CsrfViewMiddleware', 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -194,6 +196,10 @@ CORS_ALLOWED_ORIGINS = [
 # For development, you can temporarily allow all origins
 CORS_ALLOW_ALL_ORIGINS = True  # 🚨 TEMPORARY - for testing only!
 CORS_ALLOW_CREDENTIALS = True
+
+# Additional CORS settings for debugging
+CORS_PREFLIGHT_MAX_AGE = 600
+CORS_EXPOSE_HEADERS = ['Content-Length', 'X-CSRFToken']
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
