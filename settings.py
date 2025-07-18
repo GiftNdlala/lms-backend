@@ -186,8 +186,9 @@ AUTHENTICATION_BACKENDS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Add your frontend domain when deployed
-    # Example: "https://your-frontend-domain.onrender.com",
+    # Production domains
+    "https://learning-management-system-1-6lka.onrender.com",  # Frontend domain
+    "https://gas-learning-management-system.onrender.com",     # Backend domain (for self-requests)
 ]
 
 # For development, you can temporarily allow all origins
@@ -242,6 +243,9 @@ REST_FRAMEWORK = {
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    # Production domains
+    "https://learning-management-system-1-6lka.onrender.com",  # Frontend domain
+    "https://gas-learning-management-system.onrender.com",     # Backend domain
 ]
 
 # Disable CSRF for API endpoints
