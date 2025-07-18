@@ -93,6 +93,7 @@ WSGI_APPLICATION = 'lms_backend.wsgi.application'
 
 # Database configuration
 if DEBUG:
+    # Use SQLite for local development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -100,13 +101,14 @@ if DEBUG:
         }
     }
 else:
+    # Use PostgreSQL for production (Render)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'lms_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'Oliver#72'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'NAME': os.getenv('DB_NAME', 'lms_db_lf65'),
+            'USER': os.getenv('DB_USER', 'lms_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'dstMZicyMnW3TvFr7y00dIvevStmfECs'),
+            'HOST': os.getenv('DB_HOST', 'dpg-d1t1vr6r433s73estut0-a.frankfurt-postgres.render.com'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
     }
