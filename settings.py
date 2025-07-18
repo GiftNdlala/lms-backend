@@ -184,7 +184,12 @@ AUTHENTICATION_BACKENDS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    # Add your frontend domain when deployed
+    # Example: "https://your-frontend-domain.onrender.com",
 ]
+
+# For development, you can temporarily allow all origins
+# CORS_ALLOW_ALL_ORIGINS = True  # Only use in development!
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
