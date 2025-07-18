@@ -192,7 +192,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # For development, you can temporarily allow all origins
-# CORS_ALLOW_ALL_ORIGINS = True  # Only use in development!
+CORS_ALLOW_ALL_ORIGINS = True  # 🚨 TEMPORARY - for testing only!
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
