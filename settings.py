@@ -60,8 +60,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware', 
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -93,6 +94,7 @@ WSGI_APPLICATION = 'lms_backend.wsgi.application'
 
 # Database configuration
 if DEBUG:
+    # Use SQLite for local development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -100,13 +102,14 @@ if DEBUG:
         }
     }
 else:
+    # Use PostgreSQL for production (Render)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'lms_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'Oliver#72'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'NAME': os.getenv('DB_NAME', 'lms_db_lf65'),
+            'USER': os.getenv('DB_USER', 'lms_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'dstMZicyMnW3TvFr7y00dIvevStmfECs'),
+            'HOST': os.getenv('DB_HOST', 'dpg-d1t1vr6r433s73estut0-a.frankfurt-postgres.render.com'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
     }
@@ -184,8 +187,18 @@ AUTHENTICATION_BACKENDS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    # Production domains
+    "https://learning-management-system-1-6lka.onrender.com",  # Frontend domain
+    "https://gas-learning-management-system.onrender.com",     # Backend domain (for self-requests)
 ]
+
+# For development, you can temporarily allow all origins
+CORS_ALLOW_ALL_ORIGINS = True  # 🚨 TEMPORARY - for testing only!
 CORS_ALLOW_CREDENTIALS = True
+
+# Additional CORS settings for debugging
+CORS_PREFLIGHT_MAX_AGE = 600
+CORS_EXPOSE_HEADERS = ['Content-Length', 'X-CSRFToken']
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -235,6 +248,9 @@ REST_FRAMEWORK = {
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    # Production domains
+    "https://learning-management-system-1-6lka.onrender.com",  # Frontend domain
+    "https://gas-learning-management-system.onrender.com",     # Backend domain
 ]
 
 # Disable CSRF for API endpoints

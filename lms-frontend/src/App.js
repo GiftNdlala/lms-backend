@@ -43,6 +43,7 @@ import CreateQuiz from './pages/instructor/CreateQuiz';
 import StudentQuizzes from './pages/student/StudentQuizzes';
 import AllQuizzes from './pages/instructor/AllQuizzes';
 import QuizAttempt from './pages/student/QuizAttempt';
+import ApiTest from './components/ApiTest';
 
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
         <Route path="/login/student" element={<LoginStudent />} />
         <Route path="/login/funder" element={<LoginFunder />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/test-api" element={<ApiTest />} />
 
         {/* Student routes */}
         <Route path="/dashboard/student" element={<StudentLayout />}>
